@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<title>找車工具</title>
+<link rel="manifest" href="manifest.json?v=1">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+:root{--bg:#f3f5f7;--card:#fff;--text:#18212b;--sub:#5d6976;--line:#e0e5ea;--main:#0f766e;--mainS:#e3f3f1;--good:#15803d;--warn:#b45309;--bad:#b91c1c;--new:#1d4ed8;--used:#7c3aed}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1418;--card:#192127;--text:#e7edf2;--sub:#97a3ad;--line:#2a343c;--main:#34b3a6;--mainS:#17302d;--good:#4ade80;--warn:#f59e0b;--bad:#f87171;--new:#7aa2ff;--used:#b794f6}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans TC","Microsoft JhengHei",sans-serif;-webkit-tap-highlight-color:transparent}
+header{position:sticky;top:0;z-index:5;background:var(--main);color:#fff;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top))}
+@media (prefers-color-scheme:dark){header{background:#0b4f49}}
+header h1{margin:0;font-size:19px}
+header p{margin:2px 0 0;font-size:12px;opacity:.85}
+main{padding:12px 12px 90px;max-width:760px;margin:0 auto}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}
+.lbl{font-size:13px;color:var(--sub);min-width:40px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;padding:6px 12px;font-size:14px;cursor:pointer}
+.chip.on{background:var(--main);border-color:var(--main);color:#fff}
+.budget{font-weight:700;font-size:16px;color:var(--main)}
+.range{position:relative;height:34px}
+.range input{position:absolute;left:0;right:0;width:100%;top:6px;pointer-events:none;-webkit-appearance:none;appearance:none;background:none}
+.range input::-webkit-slider-thumb{pointer-events:auto;-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--main);border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.range input::-moz-range-thumb{pointer-events:auto;width:20px;height:20px;border-radius:50%;background:var(--main);border:3px solid #fff}
+.track{position:absolute;left:0;right:0;top:16px;height:6px;border-radius:3px;background:var(--line)}
+.track i{position:absolute;top:0;bottom:0;background:var(--main);border-radius:3px}
+select{font-size:14px;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--text)}
+.count{font-size:13px;color:var(--sub);margin:4px 2px 8px}
+.car{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+.car .top{display:flex;gap:10px;align-items:flex-start}
+.car h3{margin:0;font-size:17px;flex:1}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:6px;margin-right:4px;font-weight:600}
+.tag.new{background:color-mix(in srgb,var(--new) 15%,transparent);color:var(--new)}
+.tag.used{background:color-mix(in srgb,var(--used) 15%,transparent);color:var(--used)}
+.tag.pw{background:var(--mainS);color:var(--main)}
+.tag.flag{background:color-mix(in srgb,var(--warn) 15%,transparent);color:var(--warn)}
+.score{min-width:54px;text-align:center;border-radius:12px;padding:4px 6px;background:var(--mainS);color:var(--main)}
+.score b{display:block;font-size:22px;line-height:1.1}
+.score small{font-size:11px}
+.price{font-size:18px;font-weight:700;margin:6px 0 2px}
+.price small{font-size:12px;color:var(--sub);font-weight:400}
+.specs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:8px 0;font-size:12px;color:var(--sub)}
+.specs div b{display:block;color:var(--text);font-size:14px}
+.acts{display:flex;gap:6px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:10px;padding:7px 12px;font-size:14px;cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--main);color:#fff;border-color:var(--main)}
+.btn.on{background:var(--mainS);color:var(--main);border-color:var(--main)}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;border:0;background:none;color:var(--sub);padding:9px 0 8px;font-size:13px;cursor:pointer}
+nav button b{display:block;font-size:20px}
+nav button.on{color:var(--main);font-weight:700}
+.badge{background:var(--bad);color:#fff;border-radius:999px;font-size:11px;padding:0 6px;margin-left:2px}
+.hidden{display:none!important}
+.cmpwrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--sub);font-weight:500;font-size:13px;white-space:nowrap;position:sticky;left:0;background:var(--card)}
+td{min-width:96px;font-size:13px}
+th{max-width:78px;white-space:normal}
+td.best{color:var(--good);font-weight:700}
+td.best{background:color-mix(in srgb,var(--good) 10%,transparent)}
+thead td{font-weight:700;font-size:15px}
+.sec td,.sec th{background:var(--mainS);color:var(--main);font-weight:700;font-size:13px}
+.bar{height:6px;border-radius:3px;background:var(--line);margin-top:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--main)}
+.win{background:var(--mainS);border:1px solid var(--main);border-radius:14px;padding:12px;margin-bottom:12px}
+.win h2{margin:0 0 4px;font-size:17px;color:var(--main)}
+.win p{margin:4px 0;font-size:14px}
+.empty{text-align:center;color:var(--sub);padding:40px 10px}
+.sheet{position:fixed;inset:0;z-index:10;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center}
+.sheet .box{background:var(--card);width:100%;max-width:760px;max-height:88vh;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+.box h2{margin:0 0 4px;font-size:20px}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:6px 10px;font-size:14px;margin:10px 0}
+.kv span{color:var(--sub)}
+ul.pc{margin:4px 0;padding-left:20px;font-size:14px}
+.note{font-size:12px;color:var(--sub);line-height:1.6}
+h4{margin:12px 0 4px;font-size:15px}
+.w{display:grid;grid-template-columns:80px 1fr 36px;gap:8px;align-items:center;font-size:14px;margin:6px 0}
+.w input{width:100%}
+.lst{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--text)}
+.lst img{width:104px;height:78px;object-fit:cover;border-radius:8px;background:var(--line);flex:none}
+.lst .t{font-size:14px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lst .p{font-size:17px;font-weight:700;color:var(--bad)}
+.lst .m{font-size:12px;color:var(--sub)}
+</style>
+</head>
+<body>
+<header><h1>🚙 找車工具</h1><p>5 人座休旅・新車＋5 年內二手・依「家用空間＋省油養車」評分</p></header>
+
+<main>
+<section id="pgList">
+  <div class="panel">
+    <div class="row"><span class="lbl">預算</span><span class="budget" id="bTxt"></span></div>
+    <div class="range"><div class="track"><i id="bFill"></i></div>
+      <input type="range" id="bMin" min="50" max="100" step="1" value="70">
+      <input type="range" id="bMax" min="50" max="100" step="1" value="80"></div>
+    <div class="row"><span class="lbl">車況</span><span id="fCond"></span></div>
+    <div class="row"><span class="lbl">動力</span><span id="fPow"></span></div>
+    <div class="row"><span class="lbl">排序</span>
+      <select id="sort"><option value="score">推薦分數</option><option value="priceA">價格低→高</option><option value="priceD">價格高→低</option><option value="fuel">最省油</option><option value="space">空間最大</option><option value="cost">年養車費最低</option></select>
+      <button class="chip" id="favOnly">♥ 只看收藏</button></div>
+  </div>
+  <div class="count" id="count"></div>
+  <div id="list"></div>
+</section>
+
+<section id="pgCmp" class="hidden">
+  <div id="cmpBody"></div>
+</section>
+
+<section id="pgSet" class="hidden">
+  <div class="panel">
+    <h4 style="margin-top:0">評分權重</h4>
+    <p class="note">分數 0-100，依你在意的項目加權。預設：家用空間 30％、省油養車 30％。</p>
+    <div id="weights"></div>
+    <button class="btn" id="wReset">恢復預設</button>
+  </div>
+  <div class="panel">
+    <h4 style="margin-top:0">車源伺服器（Worker 網址）</h4>
+    <p class="note">架好 Cloudflare Worker 後，把網址貼在這裡，車款「詳細」裡就能直接看 8891 在售車源。</p>
+    <div class="row"><input id="wUrl" placeholder="https://xxx.workers.dev" style="flex:1;font-size:15px;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--text)"><button class="btn pri" id="wSave">儲存</button></div>
+  </div>
+  <div class="panel note">
+    <h4 style="margin-top:0;color:var(--text)">資料說明</h4>
+    • 新車價格：2026 年各車廠牌價與車媒整理（車潮誌、TVBS、鏈車網），實際以經銷商報價為準。<br>
+    • 二手價格：2026/11 行情參考（Carbook、8891 等），依里程、車況差很多，按「找 8891 車源」看實際開價。<br>
+    • 標「≈」的規格是估計值（網路資料不完整時用同級車推估），買前請再確認。<br>
+    • 年養車費＝油/電費（年跑 1.5 萬公里、95 無鉛 31 元/L、電 3 元/度）＋牌照稅＋燃料費＋保養估計。<br>
+    • 電動車牌照稅目前免徵，政策可能變動。<br>
+    • 保值、妥善率為 1-5 分的綜合口碑評估，僅供參考。<br>
+    • 在售車源：即時從 8891 讀取，只在打開車款時讀一次，30 分鐘內重複看用快取。<br>
+    資料整理日期：2026-11-25
+  </div>
+</section>
+</main>
+
+<nav>
+  <button data-pg="pgList" class="on"><b>🔍</b>找車</button>
+  <button data-pg="pgCmp"><b>⚖️</b>比較<span class="badge hidden" id="cmpN"></span></button>
+  <button data-pg="pgSet"><b>⚙️</b>設定</button>
+</nav>
+
+<div id="sheet" class="sheet hidden"><div class="box" id="sheetBox"></div></div>
+
+<script>
+// ===== 車款資料（萬元；est 列出的欄位是估計值）=====
+const CARS=[
+// ---- 新車 ----
+{id:'yariscross',s8:'toyota/yaris-cross',k8:'Yaris Cross',q8:'',x8:'',b:'Toyota',m:'Yaris Cross',c:'new',p:'汽油',eng:'1.5 自然進氣',hp:106,pr:[69.5,79.5],trims:'享樂 69.5／酷動 73.5／潮玩 79.5',fuel:17.5,len:4310,wb:2620,trunk:390,cc:1496,acc:1,aeb:1,lta:1,bsm:'高階',origin:'國產',est:['trunk'],
+ pros:['入門價最低的 Toyota 休旅','TSS 安全套件全車系標配','保值性好、維修方便'],cons:['後座與車廂偏小','1.5 動力上高速較吃力']},
+{id:'kicks',s8:'nissan/kicks',k8:'Kicks',q8:'',x8:'',b:'Nissan',m:'KICKS',c:'new',p:'汽油',eng:'1.6 自然進氣',hp:135,pr:[74.9,85.5],trims:'初綻 74.9／初綻Air 75.9／盛綻Air 81.9／極綻 85.5',fuel:16.0,len:4328,wb:2620,trunk:428,cc:1598,acc:1,aeb:1,lta:0,bsm:'高階',origin:'國產',
+ pros:['2026 年式加通風座椅，配備划算','後車廂 428L 同級夠用','TNCAP 五星'],cons:['CVT 變速箱口碑普通','保值性一般']},
+{id:'hrv',s8:'honda/hr-v',k8:'HR-V',q8:'',x8:'e:hev|hybrid|油電',b:'Honda',m:'HR-V',c:'new',p:'汽油',eng:'1.5 自然進氣',hp:121,pr:[79.9,79.9],trims:'S 79.9',fuel:16.3,len:4345,wb:2610,trunk:335,cc:1498,acc:1,aeb:1,lta:1,bsm:'—',origin:'國產',est:['trunk'],
+ pros:['ULTRA SEAT 魔術椅，後座可翻起放高物','Honda SENSING 標配','保值好'],cons:['後車廂容量偏小','1.5 動力平穩但不強']},
+{id:'hrvh',s8:'honda/hr-v',k8:'HR-V',q8:'e:hev|hybrid|油電',x8:'',b:'Honda',m:'HR-V e:HEV',c:'new',p:'油電',eng:'1.5 油電',hp:131,pr:[89.9,98.5],trims:'S 89.9／Prestige 95.9／SUPER EDITION 98.5',fuel:23.5,len:4345,wb:2610,trunk:320,cc:1498,acc:1,aeb:1,lta:1,bsm:'高階',origin:'國產',est:['trunk'],
+ pros:['油耗 23.5 km/L 很省','市區開起來安靜順','保值好'],cons:['價格接近大一級休旅','車廂偏小']},
+{id:'xforce',s8:'mitsubishi/xforce',k8:'XForce',q8:'',x8:'',b:'Mitsubishi',m:'XFORCE',c:'new',p:'汽油',eng:'1.5 自然進氣',hp:105,pr:[79.9,84.2],trims:'79.9／82.9／84.2（另有樂享特仕版 76.9 限量）',fuel:17.0,len:4390,wb:2650,trunk:360,cc:1499,acc:1,aeb:1,lta:1,bsm:'有',origin:'國產',est:['trunk','acc','aeb'],
+ pros:['車寬 1810 同級最寬，後座舒適','離地高、懸吊適合台灣路況','全車系 Level 2'],cons:['1.5 動力偏弱','品牌保值普通']},
+{id:'stonic',s8:'kia/stonic',k8:'Stonic',q8:'',x8:'',b:'Kia',m:'Stonic',c:'new',p:'油電',eng:'1.0T 48V 輕油電',hp:115,pr:[89.9,89.9],trims:'Signature 89.9',fuel:19.8,len:4165,wb:2580,trunk:352,cc:998,acc:1,aeb:1,lta:1,bsm:'有',origin:'進口',
+ pros:['配備豐富、安全輔助齊全','1.0T 稅金低'],cons:['車身最短，後座與車廂小','進口車保養較貴、保值差']},
+{id:'cc',s8:'toyota/corolla-cross',k8:'Corolla Cross',q8:'',x8:'hybrid|油電',b:'Toyota',m:'Corolla Cross',c:'new',p:'汽油',eng:'1.8 自然進氣',hp:140,pr:[80.9,91.9],trims:'豪華／尊爵／GR Sport（80.9 起）',fuel:15.0,len:4460,wb:2640,trunk:487,cc:1798,acc:1,aeb:1,lta:1,bsm:'中高階',origin:'國產',est:['fuel'],
+ pros:['國民休旅，後座、車廂都夠家用','保值最好之一','保養便宜、到處都能修'],cons:['汽油版動力普通','滿街都是']},
+{id:'cch',s8:'toyota/corolla-cross',k8:'Corolla Cross',q8:'hybrid|油電',x8:'',b:'Toyota',m:'Corolla Cross Hybrid',c:'new',p:'油電',eng:'1.8 油電',hp:122,pr:[83.9,98.9],trims:'豪華 83.9／尊爵 90.9／GR Sport 98.9／旗艦 98.9',fuel:23.5,len:4460,wb:2640,trunk:440,cc:1798,acc:1,aeb:1,lta:1,bsm:'中高階',origin:'國產',est:['trunk'],
+ pros:['油耗 23.5 km/L，養車最省之一','家用空間夠','Toyota 油電妥善率高、保值好'],cons:['高速加速普通','高階版價格破 90 萬']},
+{id:'tcross',s8:'volkswagen/t-cross',k8:'T-Cross',q8:'',x8:'',b:'Volkswagen',m:'T-Cross',c:'new',p:'汽油',eng:'1.0 TSI 渦輪',hp:115,pr:[89.8,99.8],trims:'89.8／99.8（最高階 106.8）',fuel:18.0,len:4135,wb:2551,trunk:385,cc:999,acc:1,aeb:1,lta:1,bsm:'高階',origin:'進口',
+ pros:['後座可前後滑移，車廂彈性大','德系操控扎實','1.0 稅金低'],cons:['車身短','進口保養貴、保值差']},
+{id:'tucson',s8:'hyundai/tucson',k8:'Tucson',q8:'',x8:'hybrid|油電',b:'Hyundai',m:'Tucson L 1.6T',c:'new',p:'汽油',eng:'1.6 渦輪',hp:180,pr:[99,109.9],trims:'GLT-A 約 99-101.9／GLT-B 109.9',fuel:12.5,len:4640,wb:2755,trunk:620,cc:1598,acc:1,aeb:1,lta:1,bsm:'有',origin:'國產',est:['fuel','hp','trunk'],
+ pros:['中型休旅尺寸，後座、車廂最大級','配備多、動力足'],cons:['油耗較高','保值性弱']},
+{id:'crv',s8:'honda/cr-v',k8:'CR-V',q8:'',x8:'e:hev|hybrid|油電',b:'Honda',m:'CR-V 1.5T',c:'new',p:'汽油',eng:'1.5 渦輪',hp:193,pr:[99.9,105.9],trims:'VTi-S 約 99.9-105.9',fuel:14.0,len:4691,wb:2700,trunk:589,cc:1498,acc:1,aeb:1,lta:1,bsm:'有',origin:'國產',est:['fuel','trunk'],
+ pros:['家用休旅標竿，空間超大','動力夠、保值好'],cons:['剛好在預算上緣','2027 傳將取消純汽油版']},
+{id:'xtrail',s8:'nissan/x-trail',k8:'X-Trail',q8:'',x8:'e-power',b:'Nissan',m:'X-TRAIL 1.5 VC-T',c:'new',p:'汽油',eng:'1.5 可變壓縮比渦輪',hp:204,pr:[99.9,109.9],trims:'99.9／109.9',fuel:16.0,len:4680,wb:2705,trunk:585,cc:1497,acc:1,aeb:1,lta:1,bsm:'有',origin:'國產',est:['trunk'],
+ pros:['中型休旅、動力 204 匹最強之一','油耗 16 km/L 對大車不錯'],cons:['新引擎長期妥善率待觀察','保值一般']},
+{id:'territory',s8:'ford/territory',k8:'Territory',q8:'',x8:'',b:'Ford',m:'Territory',c:'new',p:'汽油',eng:'1.5 渦輪',hp:170,pr:[94.9,99.9],trims:'94.9 起（舊換新方案約 85.9 起）',fuel:13.0,len:4630,wb:2726,trunk:448,cc:1498,acc:1,aeb:1,lta:1,bsm:'有',origin:'國產',est:['fuel','hp','trunk'],
+ pros:['車身大、大螢幕科技感','常有舊換新優惠'],cons:['油耗普通','保值性弱']},
+{id:'cx5n',s8:'mazda/cx-5',k8:'CX-5',q8:'',x8:'',b:'Mazda',m:'All-New CX-5',c:'new',p:'汽油',eng:'2.5 自然進氣 AWD',hp:190,pr:[94.9,116.9],trims:'94.9 起，最高 116.9',fuel:13.0,len:4690,wb:2815,trunk:580,cc:2488,acc:1,aeb:1,lta:1,bsm:'有',origin:'進口',est:['fuel','hp','trunk'],
+ pros:['2026 全新第三代，軸距最長','全車系四驅、質感好'],cons:['2.5 排氣量稅金較高','入門版才在預算內']},
+{id:'n7',s8:'luxgen/n7',k8:'n7',q8:'',x8:'',b:'Luxgen',m:'n⁷ 純粹版',c:'new',p:'純電',eng:'後馬達 57.7kWh',hp:230,pr:[99.9,99.9],trims:'5 人純粹版 99.9',fuel:null,range:440,len:4785,wb:2910,trunk:500,cc:0,acc:1,aeb:1,lta:1,bsm:'有',origin:'國產',est:['range','len','wb','trunk'],
+ pros:['電費極低、免牌照稅（目前）','空間大、加速快'],cons:['需有住家或公司充電','品牌保值弱、長途要規劃充電']},
+{id:'konah',s8:'hyundai/kona',k8:'Kona',q8:'hybrid|油電',x8:'',b:'Hyundai',m:'KONA Hybrid',c:'new',p:'油電',eng:'1.6 油電',hp:141,pr:[99,99],trims:'預售 99 起（正式價待公布）',fuel:21.0,len:4350,wb:2660,trunk:466,cc:1580,acc:1,aeb:1,lta:1,bsm:'有',origin:'進口',est:['fuel','trunk','len','wb'],flag:'價格未定',
+ pros:['油電省油','環景、盲區影像配備多'],cons:['價格未正式公布','進口保養較貴']},
+{id:'mghs',s8:'mg/hs',k8:'HS',q8:'',x8:'phev',b:'MG',m:'HS 1.5T',c:'new',p:'汽油',eng:'1.5 渦輪',hp:180,pr:[91.5,91.5],trims:'1.5T 旗艦 91.5',fuel:13.0,len:4670,wb:2765,trunk:507,cc:1490,acc:1,aeb:1,lta:1,bsm:'有',origin:'國產',est:['fuel','trunk','len','wb'],
+ pros:['同價位尺寸最大之一','Level 2 全車系標配'],cons:['品牌新、保值差','油耗普通']},
+{id:'kuga',s8:'ford/kuga',k8:'Kuga',q8:'',x8:'',b:'Ford',m:'Kuga 1.5T',c:'new',p:'汽油',eng:'1.5 渦輪',hp:187,pr:[93.9,101.9],trims:'客貨車認證 Vignale 93.9／Active 101.9（小客車認證 108.9 起）',fuel:13.5,len:4614,wb:2710,trunk:526,cc:1497,acc:1,aeb:1,lta:1,bsm:'有',origin:'國產',est:['fuel','trunk'],
+ pros:['操控好、動力足','客貨版稅金便宜'],cons:['客貨版有定檢與後座規定','保值弱']},
+{id:'mgzs',s8:'mg/zs',k8:'ZS',q8:'',x8:'',b:'MG',m:'ZS',c:'new',p:'汽油',eng:'1.5 自然進氣',hp:106,pr:[69.9,74.9],trims:'69.9／74.9',fuel:15.0,len:4323,wb:2585,trunk:359,cc:1498,acc:1,aeb:1,lta:1,bsm:'有',origin:'國產',est:['fuel','trunk','hp','len','wb'],
+ pros:['70 萬內就有環景、全景天窗','Level 2 標配'],cons:['動力弱','保值差']},
+{id:'venue',s8:'hyundai/venue',k8:'Venue',q8:'',x8:'',b:'Hyundai',m:'Venue',c:'new',p:'汽油',eng:'1.6 自然進氣',hp:123,pr:[73.9,81.9],trims:'73.9-81.9',fuel:14.5,len:4040,wb:2520,trunk:355,cc:1598,acc:1,aeb:1,lta:0,bsm:'高階',origin:'進口',est:['fuel','trunk','hp','wb'],
+ pros:['好停車、價格親民'],cons:['車身最小、後座最擠','保值差']},
+{id:'cx3',s8:'mazda/cx-3',k8:'CX-3',q8:'',x8:'',b:'Mazda',m:'CX-3',c:'new',p:'汽油',eng:'2.0 自然進氣',hp:156,pr:[84.9,84.9],trims:'20S Signature 84.9',fuel:15.3,len:4275,wb:2570,trunk:350,cc:1998,acc:1,aeb:1,lta:0,bsm:'有',origin:'進口',est:['trunk'],flag:'可能停售',
+ pros:['質感好、開起來靈活'],cons:['後座與車廂小','有停售消息，買前確認']},
+// ---- 二手（2021 年後）----
+{id:'u_rav4h',s8:'toyota/rav4',k8:'RAV4',q8:'hybrid|油電',x8:'phev',b:'Toyota',m:'RAV4 2.5 Hybrid',c:'used',yr:'2021-2024',p:'油電',eng:'2.5 油電',hp:218,pr:[60,92],trims:'2021 約 60-72／2022 約 65-78／2023 約 70-88／2024 約 80-92',fuel:21.0,len:4600,wb:2690,trunk:580,cc:2487,acc:1,aeb:1,lta:1,bsm:'有',origin:'進口',
+ pros:['預算內買到大一級的油電休旅','空間、油耗、保值三項都強','妥善率極高'],cons:['2.5 稅金較高','年份新的車況好的接近預算上限']},
+{id:'u_rav4',s8:'toyota/rav4',k8:'RAV4',q8:'',x8:'hybrid|油電|phev',b:'Toyota',m:'RAV4 2.0 汽油',c:'used',yr:'2021-2024',p:'汽油',eng:'2.0 自然進氣',hp:173,pr:[50,85],trims:'2021 約 50-65／2023 約 62-75／2024 約 78-85',fuel:15.0,len:4600,wb:2690,trunk:580,cc:1987,acc:1,aeb:1,lta:1,bsm:'有',origin:'進口',
+ pros:['空間大、保值好','比油電版便宜'],cons:['油耗比油電版多 4 成']},
+{id:'u_crv',s8:'honda/cr-v',k8:'CR-V',q8:'',x8:'',b:'Honda',m:'CR-V 1.5T',c:'used',yr:'2021-2023',p:'汽油',eng:'1.5 渦輪',hp:193,pr:[50,70],trims:'2021 約 50-70／2023 約 53-70',fuel:14.0,len:4600,wb:2660,trunk:522,cc:1498,acc:1,aeb:1,lta:1,bsm:'高階',origin:'國產',est:['fuel'],
+ pros:['家用空間大、後座平整','價格只有新車一半多'],cons:['舊款 1.5T 有機油增量傳聞，要看保養紀錄']},
+{id:'u_crv6',s8:'honda/cr-v',k8:'CR-V',q8:'',x8:'',b:'Honda',m:'CR-V 第六代',c:'used',yr:'2024-2025',p:'汽油',eng:'1.5 渦輪',hp:193,pr:[76,96],trims:'2024 約 76-77／2025 約 78-96',fuel:14.0,len:4691,wb:2700,trunk:589,cc:1498,acc:1,aeb:1,lta:1,bsm:'有',origin:'國產',est:['fuel'],
+ pros:['新世代、空間更大','近新車、還在原廠保固'],cons:['價差不大，可比較新車']},
+{id:'u_cc',s8:'toyota/corolla-cross',k8:'Corolla Cross',q8:'',x8:'',b:'Toyota',m:'Corolla Cross',c:'used',yr:'2021-2023',p:'油電',eng:'1.8 油電／汽油',hp:122,pr:[45,65],trims:'2021 約 45-52／2022-2023 約 52-65（油電較貴）',fuel:23.5,len:4460,wb:2640,trunk:440,cc:1798,acc:1,aeb:1,lta:1,bsm:'中高階',origin:'國產',est:['pr'],
+ pros:['50-65 萬就能買，省下的錢很多','油電版超省油'],cons:['跟新車規格差不多，價差要夠大才划算']},
+{id:'u_cx5',s8:'mazda/cx-5',k8:'CX-5',q8:'',x8:'',b:'Mazda',m:'CX-5（第二代）',c:'used',yr:'2021-2023',p:'汽油',eng:'2.0／2.5 自然進氣',hp:165,pr:[55,80],trims:'2021 約 55-65／2023 約 68-80',fuel:14.0,len:4575,wb:2700,trunk:506,cc:1998,acc:1,aeb:1,lta:1,bsm:'有',origin:'國產',est:['pr','fuel'],
+ pros:['質感好、開起來舒服','後座夠用'],cons:['車廂比 RAV4 小','保值普通']},
+{id:'u_kuga',s8:'ford/kuga',k8:'Kuga',q8:'',x8:'',b:'Ford',m:'Kuga',c:'used',yr:'2021-2023',p:'汽油',eng:'1.5 渦輪',hp:182,pr:[50,72],trims:'約 50-72（依年份與等級）',fuel:13.5,len:4614,wb:2710,trunk:526,cc:1497,acc:1,aeb:1,lta:1,bsm:'有',origin:'國產',est:['pr','fuel','trunk'],
+ pros:['折舊快，二手撿便宜','操控好'],cons:['保值差、妥善率普通']},
+{id:'u_tucson',s8:'hyundai/tucson',k8:'Tucson',q8:'',x8:'',b:'Hyundai',m:'Tucson L',c:'used',yr:'2022-2024',p:'汽油',eng:'1.6 渦輪',hp:180,pr:[62,85],trims:'約 62-85',fuel:12.5,len:4640,wb:2755,trunk:620,cc:1598,acc:1,aeb:1,lta:1,bsm:'有',origin:'國產',est:['pr','fuel','trunk'],
+ pros:['二手價很甜、空間最大級'],cons:['油耗高、保值差']},
+{id:'u_xtrail',s8:'nissan/x-trail',k8:'X-Trail',q8:'e-power',x8:'',b:'Nissan',m:'X-TRAIL e-POWER',c:'used',yr:'2023-2024',p:'油電',eng:'1.5 e-POWER 增程油電',hp:204,pr:[85,100],trims:'約 85-100',fuel:18.0,len:4680,wb:2705,trunk:575,cc:1497,acc:1,aeb:1,lta:1,bsm:'有',origin:'進口',est:['pr','fuel','trunk'],
+ pros:['新車 130 萬級，二手省很多','電動般平順加速'],cons:['在預算上緣','進口保養較貴']},
+{id:'u_ux',s8:'lexus/ux',k8:'UX',q8:'',x8:'',b:'Lexus',m:'UX 250h',c:'used',yr:'2021-2022',p:'油電',eng:'2.0 油電',hp:184,pr:[85,100],trims:'約 85-100',fuel:20.0,len:4495,wb:2640,trunk:320,cc:1987,acc:1,aeb:1,lta:1,bsm:'有',origin:'進口',est:['pr','trunk'],
+ pros:['豪華品牌、妥善率高、保值好','原廠服務好'],cons:['後座與車廂小，不適合大家庭','保養費高']},
+{id:'u_karoq',s8:'skoda/karoq',k8:'Karoq',q8:'',x8:'',b:'Skoda',m:'Karoq',c:'used',yr:'2024-2025',p:'汽油',eng:'1.5 TSI 渦輪',hp:150,pr:[55,75],trims:'2024 約 55-61／2025 約 67-75',fuel:16.0,len:4390,wb:2638,trunk:521,cc:1498,acc:1,aeb:1,lta:1,bsm:'有',origin:'進口',est:['fuel'],
+ pros:['車廂大、後座實用','近新車但折價多'],cons:['DSG 變速箱與保養費要注意']},
+{id:'u_tiguan',s8:'volkswagen/tiguan',k8:'Tiguan',q8:'',x8:'',b:'Volkswagen',m:'Tiguan 280 TSI',c:'used',yr:'2021-2022',p:'汽油',eng:'1.4 TSI 渦輪',hp:150,pr:[65,85],trims:'約 65-85',fuel:15.0,len:4509,wb:2681,trunk:615,cc:1395,acc:1,aeb:1,lta:1,bsm:'有',origin:'進口',est:['pr','fuel'],
+ pros:['車廂 615L 很大','德系質感'],cons:['保養費高、保值普通']},
+{id:'u_hrv',s8:'honda/hr-v',k8:'HR-V',q8:'',x8:'',b:'Honda',m:'HR-V',c:'used',yr:'2022-2024',p:'汽油',eng:'1.5 自然進氣',hp:121,pr:[50,65],trims:'約 50-65',fuel:16.3,len:4345,wb:2610,trunk:335,cc:1498,acc:1,aeb:1,lta:1,bsm:'—',origin:'國產',est:['pr','trunk'],
+ pros:['價格低、保值好','好開好停'],cons:['車廂小']},
+{id:'u_kicks',s8:'nissan/kicks',k8:'Kicks',q8:'',x8:'',b:'Nissan',m:'KICKS',c:'used',yr:'2021-2024',p:'汽油',eng:'1.5／1.6 自然進氣',hp:122,pr:[42,62],trims:'約 42-62',fuel:16.0,len:4295,wb:2620,trunk:428,cc:1498,acc:1,aeb:1,lta:0,bsm:'高階',origin:'國產',est:['pr'],
+ pros:['最便宜的選擇之一'],cons:['保值差、配備較舊']}
+];
+// 品牌口碑（保值 rv、妥善 rl：1-5；年保養估計 mt 萬）
+const BR={Toyota:{rv:5,rl:5,mt:1.0},Lexus:{rv:4.5,rl:5,mt:1.8},Honda:{rv:4.5,rl:4.5,mt:1.1},Nissan:{rv:3,rl:3.5,mt:1.1},Mitsubishi:{rv:3,rl:4,mt:1.0},Mazda:{rv:3.5,rl:4,mt:1.2},Hyundai:{rv:2.5,rl:3.5,mt:1.2},Kia:{rv:2.5,rl:3.5,mt:1.3},Ford:{rv:2.5,rl:3,mt:1.4},MG:{rv:2,rl:3,mt:1.2},Volkswagen:{rv:2.5,rl:3,mt:1.8},Skoda:{rv:2.5,rl:3,mt:1.7},Luxgen:{rv:2,rl:3,mt:0.7}};
+// 牌照稅＋燃料費（自用小客車，元/年）
+function tax(cc){if(!cc)return{lic:0,fuel:0};if(cc<=1200)return{lic:4320,fuel:2880};if(cc<=1800)return{lic:7120,fuel:4800};if(cc<=2400)return{lic:11230,fuel:6210};return{lic:15210,fuel:7200}}
+const KM=15000,GAS=31,KWH=3,EVEFF=6.5;
+CARS.forEach(c=>{const br=BR[c.b];c.rv=br.rv;c.rl=br.rl;c.mt=br.mt;c.tx=tax(c.cc);
+ c.energy=c.p==='純電'?Math.round(KM/EVEFF*KWH):Math.round(KM/c.fuel*GAS);
+ c.yearCost=c.energy+c.tx.lic+c.tx.fuel+Math.round(c.mt*10000);
+ c.safe=(c.acc?1:0)+(c.aeb?1:0)+(c.lta?1:0)+(c.bsm&&c.bsm!=='—'?1:0);
+ c.mid=(c.pr[0]+c.pr[1])/2;c.fuelEq=c.p==='純電'?40:c.fuel;});
+// 正規化分數
+function norm(v,a,b){return Math.max(0,Math.min(1,(v-a)/(b-a)))}
+const DW={space:30,eco:30,rv:15,rl:10,safe:15};
+let W={...DW};
+function sub(c){return{
+ space:Math.round(100*(0.45*norm(c.wb,2500,2850)+0.35*norm(c.trunk,320,620)+0.2*norm(c.len,4000,4700))),
+ eco:Math.round(100*(1-norm(c.yearCost,45000,95000))),
+ rv:Math.round(c.rv*20),rl:Math.round(c.rl*20),safe:Math.round(c.safe*25)}}
+function score(c){const s=sub(c),t=W.space+W.eco+W.rv+W.rl+W.safe||1;return Math.round((s.space*W.space+s.eco*W.eco+s.rv*W.rv+s.rl*W.rl+s.safe*W.safe)/t)}
+
+// ===== 狀態 =====
+const LS={get(k,d){try{const v=localStorage.getItem('cf_'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('cf_'+k,JSON.stringify(v))}catch(e){}}};
+let st={min:70,max:80,cond:'all',pow:[],sort:'score',favOnly:false,...LS.get('st',{})};
+let fav=LS.get('fav',[]),cmp=LS.get('cmp',[]);W={...DW,...LS.get('w',{})};
+const $=id=>document.getElementById(id);
+const fmt=n=>n.toLocaleString('zh-TW');
+const priceTxt=c=>c.pr[0]===c.pr[1]?c.pr[0]+' 萬':c.pr[0]+'–'+c.pr[1]+' 萬';
+const e=(c,k)=>c.est&&c.est.includes(k)?'≈':'';
+const name=c=>c.b+' '+c.m;
+function save(){LS.set('st',st);LS.set('fav',fav);LS.set('cmp',cmp);LS.set('w',W)}
+
+// ===== 篩選列 =====
+function chips(el,opts,isOn,onTap){el.innerHTML='';opts.forEach(([v,t])=>{const b=document.createElement('button');b.className='chip'+(isOn(v)?' on':'');b.textContent=t;b.onclick=()=>{onTap(v);render()};el.appendChild(b)})}
+function renderFilters(){
+ $('bMin').value=st.min;$('bMax').value=st.max;
+ $('bTxt').textContent=st.min+' – '+st.max+' 萬';
+ $('bFill').style.left=(st.min-50)*2+'%';$('bFill').style.right=(100-st.max)*2+'%';
+ chips($('fCond'),[['all','全部'],['new','新車'],['used','二手']],v=>st.cond===v,v=>st.cond=v);
+ chips($('fPow'),[['汽油','汽油'],['油電','油電'],['純電','純電']],v=>st.pow.includes(v),v=>{st.pow=st.pow.includes(v)?st.pow.filter(x=>x!==v):[...st.pow,v]});
+ $('sort').value=st.sort;$('favOnly').className='chip'+(st.favOnly?' on':'');
+}
+$('bMin').oninput=ev=>{st.min=Math.min(+ev.target.value,st.max-1);render()};
+$('bMax').oninput=ev=>{st.max=Math.max(+ev.target.value,st.min+1);render()};
+$('sort').onchange=ev=>{st.sort=ev.target.value;render()};
+$('favOnly').onclick=()=>{st.favOnly=!st.favOnly;render()};
+
+// ===== 列表 =====
+function filtered(){
+ let a=CARS.filter(c=>c.pr[0]<=st.max&&c.pr[1]>=st.min&&(st.cond==='all'||c.c===st.cond)&&(!st.pow.length||st.pow.includes(c.p))&&(!st.favOnly||fav.includes(c.id)));
+ const k={score:(x,y)=>score(y)-score(x),priceA:(x,y)=>x.pr[0]-y.pr[0],priceD:(x,y)=>y.pr[1]-x.pr[1],fuel:(x,y)=>y.fuelEq-x.fuelEq,space:(x,y)=>sub(y).space-sub(x).space,cost:(x,y)=>x.yearCost-y.yearCost}[st.sort];
+ return a.sort(k);
+}
+function card(c){
+ const inC=cmp.includes(c.id),f=fav.includes(c.id);
+ return `<div class="car"><div class="top"><div style="flex:1">
+ <span class="tag ${c.c}">${c.c==='new'?'新車':'二手 '+c.yr}</span><span class="tag pw">${c.p}</span>${c.flag?`<span class="tag flag">${c.flag}</span>`:''}
+ <h3 style="margin-top:6px">${name(c)}</h3>
+ <div class="price">${priceTxt(c)} <small>${c.c==='used'?'參考行情':'牌價'}</small></div></div>
+ <div class="score"><b>${score(c)}</b><small>推薦分</small></div></div>
+ <div class="specs"><div>油耗<b>${c.p==='純電'?e(c,'range')+c.range+'km':e(c,'fuel')+c.fuel}</b></div><div>軸距<b>${e(c,'wb')+c.wb}</b></div><div>後車廂<b>${e(c,'trunk')+c.trunk}L</b></div><div>年養車<b>${(c.yearCost/10000).toFixed(1)}萬</b></div></div>
+ <div class="acts"><button class="btn ${inC?'on':'pri'}" data-cmp="${c.id}">${inC?'✓ 已加入比較':'＋ 比較'}</button>
+ <button class="btn ${f?'on':''}" data-fav="${c.id}">${f?'♥':'♡'}</button>
+ <button class="btn" data-info="${c.id}">詳細</button></div></div>`;
+}
+function renderList(){
+ const a=filtered();
+ $('count').textContent=`共 ${a.length} 款符合（新車 ${a.filter(c=>c.c==='new').length}・二手 ${a.filter(c=>c.c==='used').length}）`;
+ $('list').innerHTML=a.length?a.map(card).join(''):'<div class="empty">沒有符合的車款<br>試試放寬預算或動力條件</div>';
+}
+
+// ===== 比較 =====
+function renderCmp(){
+ const n=cmp.length;$('cmpN').textContent=n;$('cmpN').classList.toggle('hidden',!n);
+ const cs=cmp.map(id=>CARS.find(c=>c.id===id)).filter(Boolean);
+ if(cs.length<2){$('cmpBody').innerHTML=`<div class="empty">已選 ${cs.length} 台<br>到「找車」按「＋ 比較」選 2-3 台來並排比較</div>${cs.length?`<div class="acts" style="justify-content:center">${cs.map(c=>`<button class="btn" data-cmp="${c.id}">✕ ${name(c)}</button>`).join('')}</div>`:''}`;return}
+ const sc=cs.map(score),best=cs[sc.indexOf(Math.max(...sc))],bs=sub(best);
+ const why=[];if(bs.space>=60)why.push('家用空間大');if(bs.eco>=60)why.push('養車費低');if(best.rv>=4.5)why.push('保值好');if(best.rl>=4.5)why.push('妥善率高');if(best.safe>=4)why.push('安全配備齊');
+ let h=`<div class="win"><h2>🏆 最推薦：${name(best)}（${Math.max(...sc)} 分）</h2><p>${why.join('、')||'綜合分數最高'}。</p><p class="note">${best.pros.slice(0,2).join('；')}</p></div>`;
+ const rows=[
+  ['sec','基本'],
+  ['類型',c=>c.c==='new'?'新車':'二手 '+c.yr],['價格',c=>priceTxt(c),c=>-c.mid],['動力',c=>c.p+'・'+c.eng],['馬力',c=>e(c,'hp')+c.hp+' PS',c=>c.hp],['產地',c=>c.origin],
+  ['sec','家用空間'],
+  ['車長',c=>e(c,'len')+fmt(c.len)+' mm',c=>c.len],['軸距',c=>e(c,'wb')+fmt(c.wb)+' mm',c=>c.wb],['後車廂',c=>e(c,'trunk')+c.trunk+' L',c=>c.trunk],
+  ['sec','省油養車（年）'],
+  ['油耗',c=>c.p==='純電'?'續航 '+e(c,'range')+c.range+' km':e(c,'fuel')+c.fuel+' km/L',c=>c.fuelEq],['油/電費',c=>fmt(c.energy)+' 元',c=>-c.energy],['牌照稅',c=>fmt(c.tx.lic)+' 元',c=>-c.tx.lic],['燃料費',c=>fmt(c.tx.fuel)+' 元',c=>-c.tx.fuel],['保養估計',c=>fmt(c.mt*10000)+' 元',c=>-c.mt],['年養車合計',c=>'<b>'+fmt(c.yearCost)+' 元</b>',c=>-c.yearCost],
+  ['sec','安全'],
+  ['ACC 跟車',c=>c.acc?'✅':'—'],['AEB 自動煞車',c=>c.aeb?'✅':'—'],['車道維持',c=>c.lta?'✅':'—'],['盲點偵測',c=>c.bsm],
+  ['sec','保值・妥善'],
+  ['保值性',c=>'★'.repeat(Math.round(c.rv))+'☆'.repeat(5-Math.round(c.rv)),c=>c.rv],['妥善率',c=>'★'.repeat(Math.round(c.rl))+'☆'.repeat(5-Math.round(c.rl)),c=>c.rl],
+  ['sec','評分（0-100）'],
+  ...[['space','家用空間'],['eco','省油養車'],['rv','保值'],['rl','妥善率'],['safe','安全']].map(([k,t])=>[t,c=>sub(c)[k]+`<div class="bar"><i style="width:${sub(c)[k]}%"></i></div>`,c=>sub(c)[k]]),
+  ['總分',c=>'<b style="font-size:18px">'+score(c)+'</b>',c=>score(c)],
+  ['sec','優缺點'],
+  ['優點',c=>c.pros.map(x=>'👍 '+x).join('<br>')],['缺點',c=>c.cons.map(x=>'⚠️ '+x).join('<br>')],
+ ];
+ h+=`<div class="cmpwrap"><table><thead><tr><th></th>${cs.map(c=>`<td>${name(c)}<br><button class="btn" style="margin-top:4px;font-size:12px;padding:3px 8px" data-cmp="${c.id}">✕ 移除</button></td>`).join('')}</tr></thead><tbody>`;
+ rows.forEach(r=>{
+  if(r[0]==='sec'){h+=`<tr class="sec"><th>${r[1]}</th>${cs.map(()=>'<td></td>').join('')}</tr>`;return}
+  const [t,f,v]=r;let bi=-1;
+  let vs=null,mx=0;if(v){vs=cs.map(v);mx=Math.max(...vs);if(vs.every(x=>x===mx))vs=null}
+  h+=`<tr><th>${t}</th>${cs.map((c,i)=>`<td class="${vs&&vs[i]===mx?'best':''}">${f(c)}</td>`).join('')}</tr>`;
+ });
+ h+=`</tbody></table></div><p class="note">綠底為該項最佳。≈ 為估計值。年養車以年跑 1.5 萬公里計。</p>`;
+ $('cmpBody').innerHTML=h;
+}
+
+// ===== 詳細 =====
+function info(id){const c=CARS.find(x=>x.id===id),s=sub(c);
+ const q=encodeURIComponent;
+ const used=`https://www.google.com/search?q=${q('8891 中古車 '+c.b+' '+c.m.replace(/[⁷]/g,'7'))}`;
+ const nw=`https://www.google.com/search?q=${q(c.b+' '+c.m+' 2026 價格 配備')}`;
+ $('sheetBox').innerHTML=`<div class="row" style="justify-content:space-between"><span><span class="tag ${c.c}">${c.c==='new'?'新車':'二手 '+c.yr}</span><span class="tag pw">${c.p}</span></span><button class="btn" id="close">✕</button></div>
+ <h2>${name(c)}</h2><div class="price">${priceTxt(c)} <small>${c.c==='used'?'參考行情':'牌價'}・推薦分 ${score(c)}</small></div>
+ <div class="kv"><span>${c.c==='used'?'各年行情':'各等級'}</span><div>${c.trims}</div>
+ <span>動力</span><div>${c.eng}・${e(c,'hp')}${c.hp} PS</div>
+ <span>油耗</span><div>${c.p==='純電'?'續航 '+e(c,'range')+c.range+' km':e(c,'fuel')+c.fuel+' km/L'}</div>
+ <span>尺寸</span><div>長 ${e(c,'len')}${fmt(c.len)}・軸距 ${e(c,'wb')}${fmt(c.wb)} mm</div>
+ <span>後車廂</span><div>${e(c,'trunk')}${c.trunk} L</div>
+ <span>年養車</span><div>約 ${fmt(c.yearCost)} 元（油電 ${fmt(c.energy)}＋稅 ${fmt(c.tx.lic+c.tx.fuel)}＋保養 ${fmt(c.mt*10000)}）</div>
+ <span>安全</span><div>${[c.acc&&'ACC',c.aeb&&'AEB',c.lta&&'車道維持',c.bsm!=='—'&&'盲點('+c.bsm+')'].filter(Boolean).join('、')}</div>
+ <span>產地</span><div>${c.origin}</div></div>
+ <h4>👍 優點</h4><ul class="pc">${c.pros.map(x=>'<li>'+x+'</li>').join('')}</ul>
+ <h4>⚠️ 注意</h4><ul class="pc">${c.cons.map(x=>'<li>'+x+'</li>').join('')}</ul>
+ <h4>評分</h4>${[['space','家用空間'],['eco','省油養車'],['rv','保值'],['rl','妥善率'],['safe','安全']].map(([k,t])=>`<div class="w"><span>${t}</span><div class="bar"><i style="width:${s[k]}%"></i></div><b>${s[k]}</b></div>`).join('')}
+ <div class="acts" style="margin-top:12px"><button class="btn ${cmp.includes(c.id)?'on':'pri'}" data-cmp="${c.id}">${cmp.includes(c.id)?'✓ 已加入比較':'＋ 比較'}</button>
+ <a class="btn" href="${used}" target="_blank" rel="noopener">🔎 找 8891 車源</a><a class="btn" href="${nw}" target="_blank" rel="noopener">📰 查新車資訊</a></div>
+ ${c.est?'<p class="note">≈ 的數字是估計值，買前請再確認。</p>':''}
+ <h4>🚗 8891 在售車源 <small class="note">${st.min}-${st.max} 萬・${yearFrom(c)} 年後</small></h4><div id="srcBox"></div>`;
+ $('sheet').classList.remove('hidden');$('close').onclick=closeSheet;
+ loadSrc(c);
+}
+function yearFrom(c){return c.c==='used'?parseInt(c.yr):2021}
+let wUrl=LS.get('wurl','');
+async function loadSrc(c){const box=$('srcBox');if(!box)return;
+ if(!wUrl){box.innerHTML='<p class="note">還沒設定車源伺服器：到「設定」貼上 Worker 網址就能直接看車源。</p>';return}
+ box.innerHTML='<p class="note">載入中…</p>';
+ try{const u=wUrl.replace(/\/$/,'')+'/8891?'+new URLSearchParams({slug:c.s8,kind:c.k8,min:st.min,max:st.max,year:yearFrom(c)});
+  const j=await (await fetch(u)).json();if(!j.ok)throw new Error(j.error||'讀取失敗');
+  let a=j.items;const q=c.q8&&new RegExp(c.q8,'i'),x=c.x8&&new RegExp(c.x8,'i');
+  a=a.filter(i=>(!q||q.test(i.title))&&(!x||!x.test(i.title))).sort((p,r)=>(p.price??1e9)-(r.price??1e9));
+  if(!$('srcBox'))return;
+  box.innerHTML=a.length?`<p class="note">找到 ${a.length} 台（價格低→高），點了開 8891 車源頁</p>`+a.slice(0,30).map(i=>`<a class="lst" href="${i.url}" target="_blank" rel="noopener"><img src="${i.image}" referrerpolicy="no-referrer" loading="lazy" alt=""><div style="min-width:0"><div class="t">${esc(i.title)}</div><div class="p">${i.price==null?'價格電洽':i.price+' 萬'}</div><div class="m">${i.year} 年・${esc(i.mileage)}・${esc(i.region)}</div></div></a>`).join(''):'<p class="note">這個預算與年份目前沒有在售車源，試試調整預算。</p>';
+ }catch(err){box.innerHTML='<p class="note">車源讀取失敗：'+esc(err.message)+'</p>'}
+}
+function esc(t){return String(t).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
+$('wUrl').value=wUrl;$('wSave').onclick=()=>{wUrl=$('wUrl').value.trim();LS.set('wurl',wUrl);toast(wUrl?'已儲存車源伺服器':'已清除')};
+function closeSheet(){$('sheet').classList.add('hidden')}
+$('sheet').onclick=ev=>{if(ev.target.id==='sheet')closeSheet()};
+
+// ===== 權重設定 =====
+function renderW(){$('weights').innerHTML=[['space','家用空間'],['eco','省油養車'],['rv','保值'],['rl','妥善率'],['safe','安全']].map(([k,t])=>`<div class="w"><span>${t}</span><input type="range" min="0" max="50" step="5" value="${W[k]}" data-w="${k}"><b>${W[k]}</b></div>`).join('')}
+$('weights').oninput=ev=>{const k=ev.target.dataset.w;if(k){W[k]=+ev.target.value;ev.target.nextElementSibling.textContent=W[k];save();renderList();renderCmp()}};
+$('wReset').onclick=()=>{W={...DW};render()};
+
+// ===== 事件 =====
+document.addEventListener('click',ev=>{const t=ev.target.closest('[data-cmp],[data-fav],[data-info],nav button');if(!t)return;
+ if(t.dataset.cmp){const id=t.dataset.cmp;if(cmp.includes(id))cmp=cmp.filter(x=>x!==id);else{if(cmp.length>=3){toast('最多比較 3 台，先移除一台');return}cmp.push(id);if(cmp.length>=2)toast('已加入，點下方「比較」查看')}
+  render();if(!$('sheet').classList.contains('hidden'))info(id)}
+ else if(t.dataset.fav){const id=t.dataset.fav;fav=fav.includes(id)?fav.filter(x=>x!==id):[...fav,id];render()}
+ else if(t.dataset.info)info(t.dataset.info);
+ else if(t.dataset.pg){document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b===t));['pgList','pgCmp','pgSet'].forEach(p=>$(p).classList.toggle('hidden',p!==t.dataset.pg));scrollTo(0,0)}
+});
+let tt;function toast(m){let d=$('toast');if(!d){d=document.createElement('div');d.id='toast';d.style.cssText='position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:#222;color:#fff;padding:8px 14px;border-radius:10px;font-size:14px;z-index:20';document.body.appendChild(d)}d.textContent=m;d.style.display='block';clearTimeout(tt);tt=setTimeout(()=>d.style.display='none',1800)}
+
+function render(){save();renderFilters();renderList();renderCmp();renderW()}
+render();
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
