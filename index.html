@@ -351,12 +351,13 @@ function info(id){const c=CARS.find(x=>x.id===id),s=sub(c);
  <div class="acts" style="margin-top:12px"><button class="btn ${cmp.includes(c.id)?'on':'pri'}" data-cmp="${c.id}">${cmp.includes(c.id)?'✓ 已加入比較':'＋ 比較'}</button>
  <a class="btn" href="${used}" target="_blank" rel="noopener">🔎 找 8891 車源</a><a class="btn" href="${nw}" target="_blank" rel="noopener">📰 查新車資訊</a></div>
  ${c.est?'<p class="note">≈ 的數字是估計值，買前請再確認。</p>':''}
- <h4>🚗 8891 在售車源 <small class="note">${st.min}-${st.max} 萬・${yearFrom(c)} 年後</small></h4><div id="srcBox"></div>`;
+ <h4>🚗 8891 在售車源 <small class="note">${st.min}-${st.max} 萬・${yearFrom(c)} 年後</small></h4><div id="srcBox"></div>
+ <p class="note">SUM 網站擋掉外部伺服器讀取，無法直接列出；<a href="https://www.sum.com.tw/carsearch.php?v=3&brand=${encodeURIComponent(c.b.toUpperCase())}&model=${encodeURIComponent(c.k8.toUpperCase())}" target="_blank" rel="noopener">開 SUM 看 ${esc(c.k8)} 車源 ↗</a></p>`;
  $('sheet').classList.remove('hidden');$('close').onclick=closeSheet;
  loadSrc(c);
 }
 function yearFrom(c){return c.c==='used'?parseInt(c.yr):2021}
-let wUrl=LS.get('wurl','');
+let wUrl=LS.get('wurl','')||'https://car-finder-api.gf41bbac.workers.dev';
 async function loadSrc(c){const box=$('srcBox');if(!box)return;
  if(!wUrl){box.innerHTML='<p class="note">還沒設定車源伺服器：到「設定」貼上 Worker 網址就能直接看車源。</p>';return}
  box.innerHTML='<p class="note">載入中…</p>';
