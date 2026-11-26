@@ -102,6 +102,7 @@ h4{margin:12px 0 4px;font-size:15px}
 <main>
 <section id="pgList">
   <div class="panel">
+    <div class="row"><span class="lbl">車名</span><input id="q" type="search" placeholder="例：RAV4、豐田、CR-V、休旅…" autocomplete="off" style="flex:1;min-width:0;font-size:16px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text)"></div>
     <div class="row"><span class="lbl">預算</span><span class="budget" id="bTxt"></span></div>
     <div class="range"><div class="track"><i id="bFill"></i></div>
       <input type="range" id="bMin" min="50" max="100" step="1" value="70">
@@ -351,15 +352,21 @@ function renderFilters(){
  chips($('fCond'),[['all','全部'],['new','新車'],['used','二手']],v=>st.cond===v,v=>st.cond=v);
  chips($('fSeat'),[['all','全部'],['5','5 人座'],['7','7 人座']],v=>(st.seat||'all')===v,v=>st.seat=v);
  chips($('fPow'),[['汽油','汽油'],['油電','油電'],['柴油','柴油'],['純電','純電']],v=>st.pow.includes(v),v=>{st.pow=st.pow.includes(v)?st.pow.filter(x=>x!==v):[...st.pow,v]});
- $('sort').value=st.sort;$('favOnly').className='chip'+(st.favOnly?' on':'');
+ $('sort').value=st.sort;if($('q').value!==(st.q||''))$('q').value=st.q||'';$('favOnly').className='chip'+(st.favOnly?' on':'');
 }
 $('bMin').oninput=ev=>{st.min=Math.min(+ev.target.value,st.max-1);render()};
 $('bMax').oninput=ev=>{st.max=Math.max(+ev.target.value,st.min+1);render()};
+$('q').oninput=ev=>{st.q=ev.target.value;save();renderList()};
 $('sort').onchange=ev=>{st.sort=ev.target.value;render()};
 $('favOnly').onclick=()=>{st.favOnly=!st.favOnly;render()};
 
 // ===== 列表 =====
+const ALIAS={Toyota:'豐田 toyota 和泰',Lexus:'凌志 lexus',Honda:'本田 honda',Nissan:'日產 裕隆 nissan',Mitsubishi:'三菱 中華 mitsubishi',Mazda:'馬自達 mazda',Hyundai:'現代 hyundai',Kia:'起亞 kia',Ford:'福特 ford',MG:'mg 名爵',Volkswagen:'福斯 vw volkswagen',Skoda:'skoda 斯柯達',Luxgen:'納智捷 luxgen'};
+const norm2=t=>String(t).toLowerCase().replace(/[\s\-_.·・⁷]/g,'').replace('n⁷','n7');
+function hit(c,q){const hay=norm2([c.b,c.m,c.k8,ALIAS[c.b]||'',c.p,c.body||'SUV',c.seats+'人座',c.c==='new'?'新車':'二手'].join(' '));return norm2(q).split(/\s+/).every(w=>hay.includes(w))}
 function filtered(){
+ const q=(st.q||'').trim();
+ if(q){return CARS.filter(c=>q.split(/\s+/).every(w=>hit(c,w))).sort((x,y)=>score(y)-score(x))}
  let a=CARS.filter(c=>c.pr[0]<=st.max&&c.pr[1]>=st.min&&(st.cond==='all'||c.c===st.cond)&&(!st.seat||st.seat==='all'||c.seats==st.seat)&&(!st.pow.length||st.pow.includes(c.p))&&(!st.favOnly||fav.includes(c.id)));
  const k={score:(x,y)=>score(y)-score(x),priceA:(x,y)=>x.pr[0]-y.pr[0],priceD:(x,y)=>y.pr[1]-x.pr[1],fuel:(x,y)=>y.fuelEq-x.fuelEq,space:(x,y)=>sub(y).space-sub(x).space,cost:(x,y)=>x.yearCost-y.yearCost}[st.sort];
  return a.sort(k);
@@ -380,7 +387,7 @@ function card(c){
 }
 function renderList(){
  const a=filtered();
- $('count').textContent=`共 ${a.length} 款符合（新車 ${a.filter(c=>c.c==='new').length}・二手 ${a.filter(c=>c.c==='used').length}）`;
+ $('count').textContent=(st.q&&st.q.trim()?`搜尋「${st.q.trim()}」（不套用預算等篩選）・`:'')+`共 ${a.length} 款符合（新車 ${a.filter(c=>c.c==='new').length}・二手 ${a.filter(c=>c.c==='used').length}）`;
  $('list').innerHTML=a.length?a.map(card).join(''):'<div class="empty">沒有符合的車款<br>試試放寬預算或動力條件</div>';
 }
 
