@@ -229,12 +229,50 @@ const CARS=[
 {id:'u_kicks',img:'https://p2.8891.com.tw/2026/11/22/17953611976452593158_600_450.jpg',imgUrl:'https://auto.8891.com.tw/usedauto-infos-4872623.html',imgTxt:'2026 年・62.8 萬',s8:'nissan/kicks',k8:'Kicks',q8:'',x8:'',b:'Nissan',m:'KICKS',c:'used',yr:'2021-2024',p:'汽油',eng:'1.5／1.6 自然進氣',hp:122,pr:[42,62],trims:'約 42-62',fuel:16.0,len:4295,wb:2620,trunk:428,cc:1498,acc:1,aeb:1,lta:0,bsm:'高階',origin:'國產',est:['pr'],
  pros:['最便宜的選擇之一'],cons:['保值差、配備較舊']}
 ];
+// 購買理由（why）與適合誰（fit）
+const WHY={
+yariscross:{why:['70 萬內就買得到 Toyota 休旅，入門門檻最低','全車系 TSS 主動安全（自動煞車、全速域跟車）','Toyota 保修據點最多，零件便宜、等料快','二手轉賣行情穩，日後換車損失小'],fit:'1-3 人小家庭、市區代步為主、預算想壓在 75 萬內'},
+kicks:{why:['2026 年式加通風座椅，同價位配備最豐富之一','後車廂 428L，推車、行李箱放得下','1.6 自然進氣結構簡單，保養單純','國產車保養費低、據點多'],fit:'想要配備多、預算 75-85 萬、主要市區通勤'},
+hrv:{why:['ULTRA SEAT 後座椅墊可掀起，能直立放盆栽、嬰兒車','Honda SENSING 全車系標配','Honda 保值僅次 Toyota','80 萬內的日系品牌休旅'],fit:'常載高物、重視轉手價、預算 80 萬'},
+hrvh:{why:['油耗 23.5 km/L，一年油錢比汽油版省約 8,000 元','e:HEV 市區多用馬達驅動，安靜、起步順','Honda 保值好，油電版二手更搶手','後座 ULTRA SEAT 靈活'],fit:'每天通勤里程長、市區塞車多、想省油'},
+xforce:{why:['車寬 1810mm 同級最寬，後座三人坐比較不擠','離地高、懸吊偏軟，坑洞路況舒服','全車系 Level 2 駕駛輔助','常有特仕版優惠，實際成交價更低'],fit:'後座常坐 3 人、家住郊區或山路多'},
+stonic:{why:['1.0T 輕油電，牌照稅只要 4,320 元','安全輔助最齊全之一（含路口對向偵測）','配備單一頂規，不用選等級','油耗 19.8 km/L 省油'],fit:'1-2 人、在意稅金與配備、不常載滿'},
+cc:{why:['台灣最熱賣休旅之一，品質口碑穩','後車廂 487L，家用空間夠','Toyota 保值第一級','保養、維修到處都有，費用透明'],fit:'第一台家用車、想選不出錯的、預算 80-90 萬'},
+cch:{why:['油耗 23.5 km/L，養車費同級最低之一','Toyota 油電系統十多年驗證，妥善率極高','油電電池原廠保固年限長，用起來安心','保值好，轉手價高'],fit:'家用＋通勤、每年開 1.5 萬公里以上、想長期持有'},
+tcross:{why:['後座可前後滑移 14 公分，空間/車廂自己調','德系底盤，高速穩定性好','1.0 排氣量稅金低','車身短好停車'],fit:'喜歡德系駕馭感、常停窄車位'},
+tucson:{why:['中型休旅尺寸，後座腿部空間大一級','後車廂約 620L，露營裝備裝得下','1.6T 動力足，高速超車輕鬆','配備多（大螢幕、電動椅）'],fit:'常載滿 5 人、常跑長途或露營'},
+crv:{why:['家用休旅標竿，後座地板平、空間大','1.5T 動力夠，高速不吃力','保值僅次 RAV4','二手市場最好賣的休旅之一'],fit:'5 人家庭、常跑高速、預算可到 100 萬'},
+xtrail:{why:['204 匹同級最強，載滿也輕鬆','可變壓縮比引擎，大車油耗仍有 16 km/L','中型休旅空間，後車廂大','價格比 CR-V、RAV4 低'],fit:'要大空間又要動力、預算 100 萬上下'},
+territory:{why:['車身大、軸距 2726mm，後座寬敞','大尺寸雙螢幕，科技感強','常有舊換新方案，實際成交可壓到 85 萬左右','配備給很多'],fit:'有舊車可換、重視空間和配備'},
+cx5n:{why:['2026 全新第三代，軸距 2815mm 這群最長','全車系四驅，雨天、山路更穩','內裝質感接近進口豪華品牌','新車款，未來幾年都是最新世代'],fit:'重視質感與操控、常跑山區、預算可到 95-100 萬'},
+n7:{why:['電費一年約 7,000 元，比汽油車省 2-3 萬','牌照稅目前免徵','空間大（軸距約 2.9 米）、加速快','保養項目少，養車費最低'],fit:'家裡或公司能裝充電樁、主要中短程通勤'},
+konah:{why:['油電省油、市區安靜','環景、盲區影像等配備多','造型新穎','進口車質感'],fit:'想要新潮外型、等正式售價公布再決定'},
+mghs:{why:['91.5 萬買到中型休旅尺寸','Level 2 駕駛輔助全車系標配','配備豐富（環景、大螢幕）','國產組裝、保養據點逐漸增加'],fit:'預算有限但想要大空間、不太在意轉手價'},
+kuga:{why:['1.5T 187 匹，操控是這群最好之一','客貨版稅金便宜（另有規定）','配備齊全','二手折價多，新車也常有優惠'],fit:'喜歡開車樂趣、預算 95-100 萬'},
+mgzs:{why:['70 萬內就有環景、全景天窗','Level 2 駕駛輔助標配','入門價最低之一','國產、保養費不高'],fit:'預算 70 萬內、主要市區代步'},
+venue:{why:['車身約 4 米，最好停車','價格親民','韓系配備多','市區靈活'],fit:'1-2 人、市區代步、常停小車位'},
+cx3:{why:['2.0 自然進氣 156 匹，動力比同級 1.5 強','Mazda 質感與操控','i-ACTIVSENSE 安全配備齊','價格單純一個等級'],fit:'1-2 人、重視開車感；買前先確認是否停售'},
+u_rav4h:{why:['70-80 萬就能買到新車要 104 萬以上的 RAV4 油電','後車廂 580L＋油耗 21 km/L，空間和省油都頂級','Toyota 油電妥善率極高，二手也放心','保值最好，3 年後轉手損失最小'],fit:'5 人家庭、想一台車開 10 年、空間和省油都要'},
+u_rav4:{why:['比油電版便宜 5-10 萬就能買到 RAV4 大空間','2.0 自然進氣結構簡單、耐用','Toyota 保值高','後車廂 580L 家用綽綽有餘'],fit:'每年開得不多（1 萬公里內）、重空間不重油耗'},
+u_crv:{why:['50-70 萬買到家用休旅標竿','後座、車廂空間大','Honda SENSING 安全配備','比新車便宜 30-40 萬'],fit:'預算 60 萬上下、5 人家庭；要看保養紀錄'},
+u_crv6:{why:['最新第六代、空間更大','還在原廠保固期內','比新車便宜十多萬','保值好'],fit:'想要新世代 CR-V、預算 80-95 萬'},
+u_cc:{why:['45-65 萬就能買，比新車省 20-30 萬','油電版超省油','Toyota 妥善率高、保值好','規格跟新車幾乎一樣'],fit:'預算 50-65 萬、想省下錢做其他用途'},
+u_cx5:{why:['質感與操控一流','價格比同年 RAV4、CR-V 低','後座舒適','安全配備齊'],fit:'重視質感、預算 60-75 萬'},
+u_kuga:{why:['折舊快，二手價很甜','1.5T 動力好、操控佳','配備齊全','空間夠家用'],fit:'預算 55-70 萬、喜歡開車樂趣'},
+u_tucson:{why:['中型休旅空間，二手價格甜','後車廂約 620L 最大級','動力足','配備多'],fit:'常載滿、常露營、預算 65-85 萬'},
+u_xtrail:{why:['新車 130 萬級的 e-POWER，二手省 30-40 萬','純電驅動般的平順加速','油耗 18 km/L 對大車很好','中型休旅空間'],fit:'想要電動車駕駛感又不想充電、預算 85-100 萬'},
+u_ux:{why:['豪華品牌 Lexus，原廠服務一流','油電妥善率極高、省油','保值好','質感與安靜度高一級'],fit:'1-3 人、重視品牌與服務、預算 85-100 萬'},
+u_karoq:{why:['後車廂 521L、後座可拆，實用性高','近新車但折價多','德系底盤穩','1.5 TSI 動力夠又省油'],fit:'重實用、喜歡歐系、預算 55-75 萬'},
+u_tiguan:{why:['後車廂 615L 這群最大之一','德系質感','二手價比新車少一半','高速穩定'],fit:'常載大件行李、喜歡德系、預算 65-85 萬'},
+u_hrv:{why:['50-65 萬的日系小休旅','保值好','好開好停','ULTRA SEAT 實用'],fit:'1-3 人、預算 50-65 萬'},
+u_kicks:{why:['預算最低的選擇之一','配備夠用','保養便宜','後車廂 428L'],fit:'預算 50 萬上下、市區代步'}
+};
 // 品牌口碑（保值 rv、妥善 rl：1-5；年保養估計 mt 萬）
 const BR={Toyota:{rv:5,rl:5,mt:1.0},Lexus:{rv:4.5,rl:5,mt:1.8},Honda:{rv:4.5,rl:4.5,mt:1.1},Nissan:{rv:3,rl:3.5,mt:1.1},Mitsubishi:{rv:3,rl:4,mt:1.0},Mazda:{rv:3.5,rl:4,mt:1.2},Hyundai:{rv:2.5,rl:3.5,mt:1.2},Kia:{rv:2.5,rl:3.5,mt:1.3},Ford:{rv:2.5,rl:3,mt:1.4},MG:{rv:2,rl:3,mt:1.2},Volkswagen:{rv:2.5,rl:3,mt:1.8},Skoda:{rv:2.5,rl:3,mt:1.7},Luxgen:{rv:2,rl:3,mt:0.7}};
 // 牌照稅＋燃料費（自用小客車，元/年）
 function tax(cc){if(!cc)return{lic:0,fuel:0};if(cc<=1200)return{lic:4320,fuel:2880};if(cc<=1800)return{lic:7120,fuel:4800};if(cc<=2400)return{lic:11230,fuel:6210};return{lic:15210,fuel:7200}}
 const KM=15000,GAS=31,KWH=3,EVEFF=6.5;
-CARS.forEach(c=>{const br=BR[c.b];c.rv=br.rv;c.rl=br.rl;c.mt=br.mt;c.tx=tax(c.cc);
+CARS.forEach(c=>{const br=BR[c.b];const wy=WHY[c.id]||{};c.why=wy.why||c.pros;c.fit=wy.fit||'';c.rv=br.rv;c.rl=br.rl;c.mt=br.mt;c.tx=tax(c.cc);
  c.energy=c.p==='純電'?Math.round(KM/EVEFF*KWH):Math.round(KM/c.fuel*GAS);
  c.yearCost=c.energy+c.tx.lic+c.tx.fuel+Math.round(c.mt*10000);
  c.safe=(c.acc?1:0)+(c.aeb?1:0)+(c.lta?1:0)+(c.bsm&&c.bsm!=='—'?1:0);
@@ -308,7 +346,7 @@ function renderCmp(){
  if(cs.length<2){$('cmpBody').innerHTML=`<div class="empty">已選 ${cs.length} 台<br>到「找車」按「＋ 比較」選 2-3 台來並排比較</div>${cs.length?`<div class="acts" style="justify-content:center">${cs.map(c=>`<button class="btn" data-cmp="${c.id}">✕ ${name(c)}</button>`).join('')}</div>`:''}`;return}
  const sc=cs.map(score),best=cs[sc.indexOf(Math.max(...sc))],bs=sub(best);
  const why=[];if(bs.space>=60)why.push('家用空間大');if(bs.eco>=60)why.push('養車費低');if(best.rv>=4.5)why.push('保值好');if(best.rl>=4.5)why.push('妥善率高');if(best.safe>=4)why.push('安全配備齊');
- let h=`<div class="win"><h2>🏆 最推薦：${name(best)}（${Math.max(...sc)} 分）</h2><p>${why.join('、')||'綜合分數最高'}。</p><p class="note">${best.pros.slice(0,2).join('；')}</p></div>`;
+ let h=`<div class="win"><h2>🏆 最推薦：${name(best)}（${Math.max(...sc)} 分）</h2><p>${why.join('、')||'綜合分數最高'}。</p><ul class="pc">${cmpWhy(best,cs.filter(x=>x!==best)).map(x=>'<li>'+x+'</li>').join('')}</ul>${best.fit?`<p class="note">👤 適合：${best.fit}</p>`:''}</div>`;
  const rows=[
   ['sec','基本'],
   ['類型',c=>c.c==='new'?'新車':'二手 '+c.yr],['價格',c=>priceTxt(c),c=>-c.mid],['動力',c=>c.p+'・'+c.eng],['馬力',c=>e(c,'hp')+c.hp+' PS',c=>c.hp],['產地',c=>c.origin],
@@ -324,7 +362,7 @@ function renderCmp(){
   ...[['space','家用空間'],['eco','省油養車'],['rv','保值'],['rl','妥善率'],['safe','安全']].map(([k,t])=>[t,c=>sub(c)[k]+`<div class="bar"><i style="width:${sub(c)[k]}%"></i></div>`,c=>sub(c)[k]]),
   ['總分',c=>'<b style="font-size:18px">'+score(c)+'</b>',c=>score(c)],
   ['sec','優缺點'],
-  ['優點',c=>c.pros.map(x=>'👍 '+x).join('<br>')],['缺點',c=>c.cons.map(x=>'⚠️ '+x).join('<br>')],
+  ['值得買',c=>c.why.map(x=>'👍 '+x).join('<br>')],['適合誰',c=>c.fit],['缺點',c=>c.cons.map(x=>'⚠️ '+x).join('<br>')],
  ];
  h+=`<div class="cmpwrap"><table><thead><tr><th></th>${cs.map(c=>`<td>${name(c)}<br><button class="btn" style="margin-top:4px;font-size:12px;padding:3px 8px" data-cmp="${c.id}">✕ 移除</button></td>`).join('')}</tr></thead><tbody>`;
  rows.forEach(r=>{
@@ -337,6 +375,18 @@ function renderCmp(){
  $('cmpBody').innerHTML=h;
 }
 
+function cmpWhy(b,os){const r=[],nm=o=>o.m;
+ os.forEach(o=>{const d=[];
+  if(o.yearCost-b.yearCost>=1500)d.push(`每年養車少 ${fmt(o.yearCost-b.yearCost)} 元`);
+  if(b.trunk-o.trunk>=30)d.push(`後車廂多 ${b.trunk-o.trunk}L`);
+  if(b.wb-o.wb>=30)d.push(`軸距長 ${b.wb-o.wb}mm（後座較寬敞）`);
+  if(b.rv-o.rv>=1)d.push('保值較好');
+  if(b.rl-o.rl>=1)d.push('妥善率較高');
+  if(o.mid-b.mid>=3)d.push(`價格約便宜 ${Math.round(o.mid-b.mid)} 萬`);
+  if(d.length)r.push(`比 ${nm(o)}：${d.join('、')}`);
+  const lose=[];if(b.mid-o.mid>=3)lose.push(`貴約 ${Math.round(b.mid-o.mid)} 萬`);if(o.trunk-b.trunk>=30)lose.push(`車廂小 ${o.trunk-b.trunk}L`);if(b.yearCost-o.yearCost>=1500)lose.push(`每年養車多 ${fmt(b.yearCost-o.yearCost)} 元`);
+  if(lose.length)r.push(`但比 ${nm(o)}：${lose.join('、')}`)});
+ return r.concat(b.why.slice(0,2))}
 // ===== 詳細 =====
 function info(id){const c=CARS.find(x=>x.id===id),s=sub(c);
  const q=encodeURIComponent;
@@ -352,7 +402,8 @@ function info(id){const c=CARS.find(x=>x.id===id),s=sub(c);
  <span>年養車</span><div>約 ${fmt(c.yearCost)} 元（油電 ${fmt(c.energy)}＋稅 ${fmt(c.tx.lic+c.tx.fuel)}＋保養 ${fmt(c.mt*10000)}）</div>
  <span>安全</span><div>${[c.acc&&'ACC',c.aeb&&'AEB',c.lta&&'車道維持',c.bsm!=='—'&&'盲點('+c.bsm+')'].filter(Boolean).join('、')}</div>
  <span>產地</span><div>${c.origin}</div></div>
- <h4>👍 優點</h4><ul class="pc">${c.pros.map(x=>'<li>'+x+'</li>').join('')}</ul>
+ <h4>💡 為什麼值得買</h4><ul class="pc">${c.why.map(x=>'<li>'+x+'</li>').join('')}</ul>
+ ${c.fit?`<h4>👤 適合誰</h4><p style="margin:4px 0;font-size:14px">${c.fit}</p>`:''}
  <h4>⚠️ 注意</h4><ul class="pc">${c.cons.map(x=>'<li>'+x+'</li>').join('')}</ul>
  <h4>評分</h4>${[['space','家用空間'],['eco','省油養車'],['rv','保值'],['rl','妥善率'],['safe','安全']].map(([k,t])=>`<div class="w"><span>${t}</span><div class="bar"><i style="width:${s[k]}%"></i></div><b>${s[k]}</b></div>`).join('')}
  <div class="acts" style="margin-top:12px"><button class="btn ${cmp.includes(c.id)?'on':'pri'}" data-cmp="${c.id}">${cmp.includes(c.id)?'✓ 已加入比較':'＋ 比較'}</button>
