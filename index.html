@@ -43,6 +43,7 @@ select{font-size:14px;padding:6px 8px;border-radius:8px;border:1px solid var(--l
 .tag.new{background:color-mix(in srgb,var(--new) 15%,transparent);color:var(--new)}
 .tag.used{background:color-mix(in srgb,var(--used) 15%,transparent);color:var(--used)}
 .tag.pw{background:var(--mainS);color:var(--main)}
+.tag.seat7{background:color-mix(in srgb,var(--warn) 15%,transparent);color:var(--warn)}
 .tag.flag{background:color-mix(in srgb,var(--warn) 15%,transparent);color:var(--warn)}
 .score{min-width:54px;text-align:center;border-radius:12px;padding:4px 6px;background:var(--mainS);color:var(--main)}
 .score b{display:block;font-size:22px;line-height:1.1}
@@ -95,7 +96,7 @@ h4{margin:12px 0 4px;font-size:15px}
 </style>
 </head>
 <body>
-<header><h1>🚙 找車工具</h1><p>5 人座休旅・新車＋5 年內二手・依「家用空間＋省油養車」評分</p></header>
+<header><h1>🚙 找車工具</h1><p>5 / 7 人座休旅・MPV・新車＋5 年內二手・依「家用空間＋省油養車」評分</p></header>
 
 <main>
 <section id="pgList">
@@ -105,6 +106,7 @@ h4{margin:12px 0 4px;font-size:15px}
       <input type="range" id="bMin" min="50" max="100" step="1" value="70">
       <input type="range" id="bMax" min="50" max="100" step="1" value="80"></div>
     <div class="row"><span class="lbl">車況</span><span id="fCond"></span></div>
+    <div class="row"><span class="lbl">座位</span><span id="fSeat"></span></div>
     <div class="row"><span class="lbl">動力</span><span id="fPow"></span></div>
     <div class="row"><span class="lbl">排序</span>
       <select id="sort"><option value="score">推薦分數</option><option value="priceA">價格低→高</option><option value="priceD">價格高→低</option><option value="fuel">最省油</option><option value="space">空間最大</option><option value="cost">年養車費最低</option></select>
@@ -135,7 +137,8 @@ h4{margin:12px 0 4px;font-size:15px}
     • 新車價格：2026 年各車廠牌價與車媒整理（車潮誌、TVBS、鏈車網），實際以經銷商報價為準。<br>
     • 二手價格：2026/11 行情參考（Carbook、8891 等），依里程、車況差很多，按「找 8891 車源」看實際開價。<br>
     • 標「≈」的規格是估計值（網路資料不完整時用同級車推估），買前請再確認。<br>
-    • 年養車費＝油/電費（年跑 1.5 萬公里、95 無鉛 31 元/L、電 3 元/度）＋牌照稅＋燃料費＋保養估計。<br>
+    • 7 人座的後車廂是第三排收倒後的容量；第三排立起時通常只剩 200-300L。<br>
+    • 年養車費＝油/電費（年跑 1.5 萬公里、95 無鉛 31 元/L、柴油 28 元/L、電 3 元/度）＋牌照稅＋燃料費＋保養估計。<br>
     • 電動車牌照稅目前免徵，政策可能變動。<br>
     • 保值、妥善率為 1-5 分的綜合口碑評估，僅供參考。<br>
     • 車款封面照：取自 8891 該車款的一台在售車，點照片會開那台車的 8891 頁面；車賣掉後連結可能失效，請改看「詳細」裡的即時車源。<br>
@@ -227,7 +230,34 @@ const CARS=[
 {id:'u_hrv',img:'https://p2.8891.com.tw/2026/11/07/17940416231927097884_600_450.jpg',imgUrl:'https://auto.8891.com.tw/usedauto-infos-4856530.html',imgTxt:'2026 年・73.8 萬',s8:'honda/hr-v',k8:'HR-V',q8:'',x8:'',b:'Honda',m:'HR-V',c:'used',yr:'2022-2024',p:'汽油',eng:'1.5 自然進氣',hp:121,pr:[50,65],trims:'約 50-65',fuel:16.3,len:4345,wb:2610,trunk:335,cc:1498,acc:1,aeb:1,lta:1,bsm:'—',origin:'國產',est:['pr','trunk'],
  pros:['價格低、保值好','好開好停'],cons:['車廂小']},
 {id:'u_kicks',img:'https://p2.8891.com.tw/2026/11/22/17953611976452593158_600_450.jpg',imgUrl:'https://auto.8891.com.tw/usedauto-infos-4872623.html',imgTxt:'2026 年・62.8 萬',s8:'nissan/kicks',k8:'Kicks',q8:'',x8:'',b:'Nissan',m:'KICKS',c:'used',yr:'2021-2024',p:'汽油',eng:'1.5／1.6 自然進氣',hp:122,pr:[42,62],trims:'約 42-62',fuel:16.0,len:4295,wb:2620,trunk:428,cc:1498,acc:1,aeb:1,lta:0,bsm:'高階',origin:'國產',est:['pr'],
- pros:['最便宜的選擇之一'],cons:['保值差、配備較舊']}
+ pros:['最便宜的選擇之一'],cons:['保值差、配備較舊']},
+// ---- 7 人座 ----
+{id:'zinger',img:'https://p2.8891.com.tw/2026/09/23/17901502757669131172_600_450.jpg',imgUrl:'https://auto.8891.com.tw/usedauto-infos-4873275.html',imgTxt:'2025 年・69.8 萬',seats:7,body:'MPV',s8:'mitsubishi/zinger',k8:'Zinger',q8:'',x8:'',b:'Mitsubishi',m:'Zinger 1.5T',c:'new',p:'汽油',eng:'1.5 渦輪',hp:172,pr:[71.9,91.5],trims:'約 71.9-91.5（依等級）',fuel:13.0,len:4665,wb:2810,trunk:600,cc:1499,acc:1,aeb:1,lta:1,bsm:'高階',origin:'國產',est:['fuel','wb','trunk','acc','aeb','lta'],
+ pros:['100 萬內少數的新車 7 人座','1.5T＋8 速自排，載滿也夠力'],cons:['油耗普通','保值一般']},
+{id:'g50',img:'https://p2.8891.com.tw/2026/10/13/17918639267890207776_600_450.jpg',imgUrl:'https://auto.8891.com.tw/usedauto-infos-4831240.html',imgTxt:'2026 年・95.9 萬',seats:7,body:'MPV',s8:'mg/g50-plus',k8:'G50 Plus',q8:'',x8:'',b:'MG',m:'G50 Plus',c:'new',p:'汽油',eng:'1.5 渦輪',hp:180,pr:[98.5,108.5],trims:'旗艦 108.5（減徵價 103.5、汰舊價 98.5）',fuel:13.6,len:4825,wb:2800,trunk:700,cc:1490,acc:1,aeb:1,lta:1,bsm:'有',origin:'國產',est:['trunk'],
+ pros:['車身 4.8 米、軸距 2.8 米，三排都能坐大人','Level 2＋360 環景標配'],cons:['汰舊換新才壓到 100 萬內','品牌保值弱']},
+{id:'u_zinger',img:'https://p2.8891.com.tw/2026/11/10/17942960708513751592_600_450.jpg',imgUrl:'https://auto.8891.com.tw/usedauto-infos-4855613.html',imgTxt:'2024 年・69.8 萬',seats:7,body:'MPV',s8:'mitsubishi/zinger',k8:'Zinger',q8:'1\\.5',x8:'',b:'Mitsubishi',m:'Zinger 1.5T',c:'used',yr:'2024-2025',p:'汽油',eng:'1.5 渦輪',hp:172,pr:[60,78],trims:'約 60-78',fuel:13.0,len:4665,wb:2810,trunk:600,cc:1499,acc:1,aeb:1,lta:1,bsm:'高階',origin:'國產',est:['pr','fuel','wb','trunk'],
+ pros:['近新車、比新車便宜 10 萬以上','7 人座實用'],cons:['油耗普通']},
+{id:'u_sienta',img:'https://p1.8891.com.tw/2026/10/08/17914596919621411359_600_450.jpg',imgUrl:'https://auto.8891.com.tw/usedauto-infos-4827191.html',imgTxt:'2024 年・66.8 萬',seats:7,body:'MPV',s8:'toyota/sienta',k8:'Sienta',q8:'7人|七人',x8:'',b:'Toyota',m:'Sienta 7 人座',c:'used',yr:'2021-2024',p:'汽油',eng:'1.8 自然進氣',hp:140,pr:[38,62],trims:'約 38-62（已停產，只有二手）',fuel:14.6,len:4260,wb:2750,trunk:550,cc:1797,acc:0,aeb:1,lta:0,bsm:'高階',origin:'國產',est:['pr','trunk'],
+ pros:['車身短好停，卻有 7 個座位＋電動滑門','Toyota 保值、妥善率高'],cons:['第三排只適合小孩','已停產、沒新車']},
+{id:'u_outlander',img:'https://p2.8891.com.tw/2026/11/22/17953424242287116662_600_450.jpg',imgUrl:'https://auto.8891.com.tw/usedauto-infos-4872497.html',imgTxt:'2024 年・59.8 萬',seats:7,body:'SUV',s8:'mitsubishi/outlander',k8:'Outlander',q8:'',x8:'',b:'Mitsubishi',m:'Outlander 2.4',c:'used',yr:'2021-2024',p:'汽油',eng:'2.4 自然進氣',hp:167,pr:[38,60],trims:'約 38-60',fuel:12.5,len:4695,wb:2670,trunk:590,cc:2360,acc:1,aeb:1,lta:0,bsm:'有',origin:'國產',est:['pr','fuel','trunk'],
+ pros:['最便宜的 7 人座休旅之一','耐用、維修便宜'],cons:['舊世代設計','第三排小、油耗高']},
+{id:'u_custin',img:'https://p1.8891.com.tw/2026/11/14/17946471306252658543_600_450.jpg',imgUrl:'https://auto.8891.com.tw/usedauto-infos-4864306.html',imgTxt:'2025 年・103.8 萬',seats:7,body:'MPV',s8:'hyundai/custin',k8:'Custin',q8:'',x8:'',b:'Hyundai',m:'Custin 1.5T',c:'used',yr:'2023-2025',p:'汽油',eng:'1.5 渦輪',hp:170,pr:[80,100],trims:'約 80-100（新車 131 萬起）',fuel:15.0,len:4950,wb:3055,trunk:710,cc:1497,acc:1,aeb:1,lta:1,bsm:'有',origin:'國產',est:['pr','trunk'],
+ pros:['軸距 3 米，三排空間最大','新車 130 萬級，二手省 30 萬以上'],cons:['車身近 5 米，停車要習慣','保值弱']},
+{id:'u_kodiaq',img:'https://p2.8891.com.tw/2026/10/26/17930292821505566024_600_450.jpg',imgUrl:'https://auto.8891.com.tw/usedauto-infos-4843751.html',imgTxt:'2025 年・99.8 萬',seats:7,body:'SUV',s8:'skoda/kodiaq',k8:'Kodiaq',q8:'',x8:'',b:'Skoda',m:'Kodiaq（7 人座）',c:'used',yr:'2021-2024',p:'汽油',eng:'1.4／2.0 TSI 渦輪',hp:150,pr:[60,95],trims:'約 60-95（注意有 5 人座版本）',fuel:14.0,len:4697,wb:2791,trunk:630,cc:1395,acc:1,aeb:1,lta:1,bsm:'有',origin:'進口',est:['pr','fuel','trunk'],
+ pros:['車廂大、做工扎實','德系底盤高速穩'],cons:['部分車是 5 人座，要確認','保養費較高']},
+{id:'u_touran',img:'https://p2.8891.com.tw/2026/07/13/17839264562377235914_600_450.jpg',imgUrl:'https://auto.8891.com.tw/usedauto-infos-4737452.html',imgTxt:'2024 年・87 萬',seats:7,body:'MPV',s8:'volkswagen/touran',k8:'Touran',q8:'',x8:'',b:'Volkswagen',m:'Touran',c:'used',yr:'2021-2024',p:'汽油',eng:'1.4／1.5 TSI 渦輪',hp:150,pr:[60,95],trims:'約 60-95',fuel:15.5,len:4527,wb:2791,trunk:740,cc:1395,acc:1,aeb:1,lta:1,bsm:'有',origin:'進口',est:['pr','fuel','trunk'],
+ pros:['後兩排座椅可獨立收折，彈性最高','車身不大、好開好停'],cons:['保養費高','第三排適合小孩']},
+{id:'u_allspace',img:'https://p2.8891.com.tw/2026/11/12/17944506470924245388_600_450.jpg',imgUrl:'https://auto.8891.com.tw/usedauto-infos-4861282.html',imgTxt:'2024 年・97.8 萬',seats:7,body:'SUV',s8:'volkswagen/tiguan-allspace',k8:'Tiguan Allspace',q8:'',x8:'',b:'Volkswagen',m:'Tiguan Allspace',c:'used',yr:'2021-2023',p:'汽油',eng:'1.4／2.0 TSI 渦輪',hp:150,pr:[65,100],trims:'約 65-100',fuel:14.0,len:4701,wb:2791,trunk:700,cc:1395,acc:1,aeb:1,lta:1,bsm:'有',origin:'進口',est:['pr','fuel','trunk'],
+ pros:['加長版 Tiguan，5+2 彈性','德系質感'],cons:['保養費高、保值普通']},
+{id:'u_cx9',img:'https://p2.8891.com.tw/2026/11/03/17936865513526184172_600_450.jpg',imgUrl:'https://auto.8891.com.tw/usedauto-infos-4851538.html',imgTxt:'2023 年・85.8 萬',seats:7,body:'SUV',s8:'mazda/cx-9',k8:'CX-9',q8:'',x8:'',b:'Mazda',m:'CX-9',c:'used',yr:'2021-2023',p:'汽油',eng:'2.5 渦輪',hp:231,pr:[69,98],trims:'約 69-98',fuel:10.5,len:5075,wb:2930,trunk:810,cc:2488,acc:1,aeb:1,lta:1,bsm:'有',origin:'進口',est:['pr','fuel','trunk'],
+ pros:['大型 7 人座休旅，第三排大人能坐','質感豪華、動力強'],cons:['油耗高、稅金高','車身 5 米停車難']},
+{id:'u_tourneo',img:'https://p1.8891.com.tw/2026/11/03/17936934158709745615_600_450.jpg',imgUrl:'https://auto.8891.com.tw/usedauto-infos-4851780.html',imgTxt:'2023 年・75.6 萬',seats:7,body:'MPV',s8:'ford/tourneo-connect',k8:'Tourneo Connect',q8:'',x8:'',b:'Ford',m:'Tourneo Connect',c:'used',yr:'2021-2024',p:'柴油',eng:'2.0 柴油渦輪',hp:122,pr:[50,85],trims:'約 50-85',fuel:18.8,len:4825,wb:2970,trunk:800,cc:1997,acc:1,aeb:1,lta:1,bsm:'有',origin:'進口',est:['pr','trunk','wb'],
+ pros:['柴油省、續航長','方正車廂＋滑門，載物載人超實用'],cons:['商用車感較重','柴油車保養要注意']},
+{id:'u_sorento',img:'https://p2.8891.com.tw/2026/11/02/17936336365781104352_600_450.png',imgUrl:'https://auto.8891.com.tw/usedauto-infos-4851013.html',imgTxt:'2022 年・78 萬',seats:7,body:'SUV',s8:'kia/sorento',k8:'Sorento',q8:'',x8:'',b:'Kia',m:'Sorento',c:'used',yr:'2021-2023',p:'柴油',eng:'2.2 柴油渦輪',hp:202,pr:[78,100],trims:'約 78-100（車源少）',fuel:15.0,len:4810,wb:2815,trunk:616,cc:2151,acc:1,aeb:1,lta:1,bsm:'有',origin:'進口',est:['pr','fuel','trunk'],
+ pros:['柴油扭力大，載滿不吃力','配備豐富'],cons:['車源少','保值弱']},
+{id:'u_santafe',img:'https://p1.8891.com.tw/2026/10/30/17933472835156036595_600_450.jpg',imgUrl:'https://auto.8891.com.tw/usedauto-infos-4847734.html',imgTxt:'2022 年・87.8 萬',seats:7,body:'SUV',s8:'hyundai/santa-fe',k8:'Santa Fe',q8:'柴油|2\\.2|crdi',x8:'',b:'Hyundai',m:'Santa Fe',c:'used',yr:'2021-2023',p:'柴油',eng:'2.2 柴油渦輪',hp:202,pr:[63,90],trims:'約 63-90',fuel:14.5,len:4785,wb:2765,trunk:634,cc:2199,acc:1,aeb:1,lta:1,bsm:'有',origin:'國產',est:['pr','fuel','trunk'],
+ pros:['新車 170 萬級，二手價差大','空間大、配備多'],cons:['保值弱','柴油車稅金較高']}
 ];
 // 購買理由（why）與適合誰（fit）
 const WHY={
@@ -265,15 +295,28 @@ u_ux:{why:['豪華品牌 Lexus，原廠服務一流','油電妥善率極高、�
 u_karoq:{why:['後車廂 521L、後座可拆，實用性高','近新車但折價多','德系底盤穩','1.5 TSI 動力夠又省油'],fit:'重實用、喜歡歐系、預算 55-75 萬'},
 u_tiguan:{why:['後車廂 615L 這群最大之一','德系質感','二手價比新車少一半','高速穩定'],fit:'常載大件行李、喜歡德系、預算 65-85 萬'},
 u_hrv:{why:['50-65 萬的日系小休旅','保值好','好開好停','ULTRA SEAT 實用'],fit:'1-3 人、預算 50-65 萬'},
-u_kicks:{why:['預算最低的選擇之一','配備夠用','保養便宜','後車廂 428L'],fit:'預算 50 萬上下、市區代步'}
+u_kicks:{why:['預算最低的選擇之一','配備夠用','保養便宜','後車廂 428L'],fit:'預算 50 萬上下、市區代步'},
+zinger:{why:['100 萬內少數還買得到的新車 7 人座','1.5T＋8 速自排，載滿 7 人仍有力','國產車保養費低、據點多','座椅可靈活收折，載人載貨都行'],fit:'家裡 5 人以上、偶爾載長輩或朋友、預算 75-90 萬'},
+g50:{why:['車身 4.8 米、軸距 2.8 米，第三排也能坐大人','Level 2 駕駛輔助＋360 環景標配','汰舊換新可壓到 98.5 萬','同價位空間最大的新車 MPV'],fit:'常 6-7 人出遊、有舊車可汰換'},
+u_zinger:{why:['近新車，比新車省 10 萬以上','7 人座、方正好用','國產保養便宜','新世代 1.5T 動力'],fit:'要 7 人座、預算 60-75 萬'},
+u_sienta:{why:['40-60 萬就有 7 個座位＋電動滑門','車身只有 4.26 米，市區好停','Toyota 保值、妥善率高','滑門上下車方便長輩小孩'],fit:'家有小孩或長輩、多在市區、偶爾坐滿'},
+u_outlander:{why:['40-60 萬最便宜的 7 人座休旅之一','三菱耐用、維修便宜','國產零件好取得','空間比 Sienta 大'],fit:'預算 50-60 萬、偶爾需要第三排'},
+u_custin:{why:['軸距 3 米，三排都寬敞，第二排獨立座椅','新車 131 萬起，二手省 30 萬以上','國產、保養據點多','電動滑門、配備豐富'],fit:'常載滿 6-7 人、長途家庭旅遊'},
+u_kodiaq:{why:['車廂大、第三排可收平','德系底盤，高速穩','做工扎實','二手價比新車少一半'],fit:'要大空間又喜歡德系；看車時確認是 7 人座'},
+u_touran:{why:['第二排三張獨立座椅，可各自滑移收折','車身 4.5 米好停','德系安全配備齊','MPV 空間利用率高'],fit:'小孩多、需要彈性座椅配置'},
+u_allspace:{why:['Tiguan 加長版，5+2 彈性','德系質感','高速穩定','車廂大'],fit:'平常 5 人、偶爾 7 人'},
+u_cx9:{why:['大型休旅，第三排大人也能坐','2.5T 動力強','內裝質感接近豪華品牌','二手價格甜'],fit:'常 7 人長途、不在意油耗'},
+u_tourneo:{why:['柴油油耗 18.8 km/L，7 人座最省','方正車廂＋電動滑門','後車廂超大，露營、推車輕鬆','二手價格親民'],fit:'露營、載物多、重實用不重外型'},
+u_sorento:{why:['柴油 202 匹，載滿 7 人也輕鬆','配備豐富','空間大','價格比新車少一半'],fit:'常跑長途、載滿人；車源少要耐心找'},
+u_santafe:{why:['新車 170 萬級，二手省很多','空間大、配備多','柴油扭力大','國產保養據點多'],fit:'要大 7 人座休旅、預算 70-90 萬'}
 };
 // 品牌口碑（保值 rv、妥善 rl：1-5；年保養估計 mt 萬）
 const BR={Toyota:{rv:5,rl:5,mt:1.0},Lexus:{rv:4.5,rl:5,mt:1.8},Honda:{rv:4.5,rl:4.5,mt:1.1},Nissan:{rv:3,rl:3.5,mt:1.1},Mitsubishi:{rv:3,rl:4,mt:1.0},Mazda:{rv:3.5,rl:4,mt:1.2},Hyundai:{rv:2.5,rl:3.5,mt:1.2},Kia:{rv:2.5,rl:3.5,mt:1.3},Ford:{rv:2.5,rl:3,mt:1.4},MG:{rv:2,rl:3,mt:1.2},Volkswagen:{rv:2.5,rl:3,mt:1.8},Skoda:{rv:2.5,rl:3,mt:1.7},Luxgen:{rv:2,rl:3,mt:0.7}};
 // 牌照稅＋燃料費（自用小客車，元/年）
 function tax(cc){if(!cc)return{lic:0,fuel:0};if(cc<=1200)return{lic:4320,fuel:2880};if(cc<=1800)return{lic:7120,fuel:4800};if(cc<=2400)return{lic:11230,fuel:6210};return{lic:15210,fuel:7200}}
-const KM=15000,GAS=31,KWH=3,EVEFF=6.5;
+const KM=15000,GAS=31,DIESEL=28,KWH=3,EVEFF=6.5;
 CARS.forEach(c=>{const br=BR[c.b];const wy=WHY[c.id]||{};c.why=wy.why||c.pros;c.fit=wy.fit||'';c.rv=br.rv;c.rl=br.rl;c.mt=br.mt;c.tx=tax(c.cc);
- c.energy=c.p==='純電'?Math.round(KM/EVEFF*KWH):Math.round(KM/c.fuel*GAS);
+ c.seats=c.seats||5;c.body=c.body||'SUV';c.energy=c.p==='純電'?Math.round(KM/EVEFF*KWH):Math.round(KM/c.fuel*(c.p==='柴油'?DIESEL:GAS));
  c.yearCost=c.energy+c.tx.lic+c.tx.fuel+Math.round(c.mt*10000);
  c.safe=(c.acc?1:0)+(c.aeb?1:0)+(c.lta?1:0)+(c.bsm&&c.bsm!=='—'?1:0);
  c.mid=(c.pr[0]+c.pr[1])/2;c.fuelEq=c.p==='純電'?40:c.fuel;});
@@ -289,7 +332,7 @@ function score(c){const s=sub(c),t=W.space+W.eco+W.rv+W.rl+W.safe||1;return Math
 
 // ===== 狀態 =====
 const LS={get(k,d){try{const v=localStorage.getItem('cf_'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('cf_'+k,JSON.stringify(v))}catch(e){}}};
-let st={min:70,max:80,cond:'all',pow:[],sort:'score',favOnly:false,...LS.get('st',{})};
+let st={min:70,max:80,cond:'all',seat:'all',pow:[],sort:'score',favOnly:false,...LS.get('st',{})};
 let fav=LS.get('fav',[]),cmp=LS.get('cmp',[]);W={...DW,...LS.get('w',{})};
 const $=id=>document.getElementById(id);
 const fmt=n=>n.toLocaleString('zh-TW');
@@ -305,7 +348,8 @@ function renderFilters(){
  $('bTxt').textContent=st.min+' – '+st.max+' 萬';
  $('bFill').style.left=(st.min-50)*2+'%';$('bFill').style.right=(100-st.max)*2+'%';
  chips($('fCond'),[['all','全部'],['new','新車'],['used','二手']],v=>st.cond===v,v=>st.cond=v);
- chips($('fPow'),[['汽油','汽油'],['油電','油電'],['純電','純電']],v=>st.pow.includes(v),v=>{st.pow=st.pow.includes(v)?st.pow.filter(x=>x!==v):[...st.pow,v]});
+ chips($('fSeat'),[['all','全部'],['5','5 人座'],['7','7 人座']],v=>(st.seat||'all')===v,v=>st.seat=v);
+ chips($('fPow'),[['汽油','汽油'],['油電','油電'],['柴油','柴油'],['純電','純電']],v=>st.pow.includes(v),v=>{st.pow=st.pow.includes(v)?st.pow.filter(x=>x!==v):[...st.pow,v]});
  $('sort').value=st.sort;$('favOnly').className='chip'+(st.favOnly?' on':'');
 }
 $('bMin').oninput=ev=>{st.min=Math.min(+ev.target.value,st.max-1);render()};
@@ -315,7 +359,7 @@ $('favOnly').onclick=()=>{st.favOnly=!st.favOnly;render()};
 
 // ===== 列表 =====
 function filtered(){
- let a=CARS.filter(c=>c.pr[0]<=st.max&&c.pr[1]>=st.min&&(st.cond==='all'||c.c===st.cond)&&(!st.pow.length||st.pow.includes(c.p))&&(!st.favOnly||fav.includes(c.id)));
+ let a=CARS.filter(c=>c.pr[0]<=st.max&&c.pr[1]>=st.min&&(st.cond==='all'||c.c===st.cond)&&(!st.seat||st.seat==='all'||c.seats==st.seat)&&(!st.pow.length||st.pow.includes(c.p))&&(!st.favOnly||fav.includes(c.id)));
  const k={score:(x,y)=>score(y)-score(x),priceA:(x,y)=>x.pr[0]-y.pr[0],priceD:(x,y)=>y.pr[1]-x.pr[1],fuel:(x,y)=>y.fuelEq-x.fuelEq,space:(x,y)=>sub(y).space-sub(x).space,cost:(x,y)=>x.yearCost-y.yearCost}[st.sort];
  return a.sort(k);
 }
@@ -324,11 +368,11 @@ function coverHtml(c,cls){if(!c.img)return'';
 function card(c){
  const inC=cmp.includes(c.id),f=fav.includes(c.id);
  return `<div class="car">${coverHtml(c,"cover")}<div class="top"><div style="flex:1">
- <span class="tag ${c.c}">${c.c==='new'?'新車':'二手 '+c.yr}</span><span class="tag pw">${c.p}</span>${c.flag?`<span class="tag flag">${c.flag}</span>`:''}
+ <span class="tag ${c.c}">${c.c==='new'?'新車':'二手 '+c.yr}</span><span class="tag pw">${c.p}</span>${c.seats===7?`<span class="tag seat7">7 人座・${c.body}</span>`:''}${c.flag?`<span class="tag flag">${c.flag}</span>`:''}
  <h3 style="margin-top:6px">${name(c)}</h3>
  <div class="price">${priceTxt(c)} <small>${c.c==='used'?'參考行情':'牌價'}</small></div></div>
  <div class="score"><b>${score(c)}</b><small>推薦分</small></div></div>
- <div class="specs"><div>油耗<b>${c.p==='純電'?e(c,'range')+c.range+'km':e(c,'fuel')+c.fuel}</b></div><div>軸距<b>${e(c,'wb')+c.wb}</b></div><div>後車廂<b>${e(c,'trunk')+c.trunk}L</b></div><div>年養車<b>${(c.yearCost/10000).toFixed(1)}萬</b></div></div>
+ <div class="specs"><div>油耗<b>${c.p==='純電'?e(c,'range')+c.range+'km':e(c,'fuel')+c.fuel}</b></div><div>軸距<b>${e(c,'wb')+c.wb}</b></div><div>${c.seats===7?'車廂(三排倒)':'後車廂'}<b>${e(c,'trunk')+c.trunk}L</b></div><div>年養車<b>${(c.yearCost/10000).toFixed(1)}萬</b></div></div>
  <div class="acts"><button class="btn ${inC?'on':'pri'}" data-cmp="${c.id}">${inC?'✓ 已加入比較':'＋ 比較'}</button>
  <button class="btn ${f?'on':''}" data-fav="${c.id}">${f?'♥':'♡'}</button>
  <button class="btn" data-info="${c.id}">詳細</button></div></div>`;
@@ -349,9 +393,9 @@ function renderCmp(){
  let h=`<div class="win"><h2>🏆 最推薦：${name(best)}（${Math.max(...sc)} 分）</h2><p>${why.join('、')||'綜合分數最高'}。</p><ul class="pc">${cmpWhy(best,cs.filter(x=>x!==best)).map(x=>'<li>'+x+'</li>').join('')}</ul>${best.fit?`<p class="note">👤 適合：${best.fit}</p>`:''}</div>`;
  const rows=[
   ['sec','基本'],
-  ['類型',c=>c.c==='new'?'新車':'二手 '+c.yr],['價格',c=>priceTxt(c),c=>-c.mid],['動力',c=>c.p+'・'+c.eng],['馬力',c=>e(c,'hp')+c.hp+' PS',c=>c.hp],['產地',c=>c.origin],
+  ['類型',c=>c.c==='new'?'新車':'二手 '+c.yr],['座位',c=>c.seats+' 人・'+c.body,c=>c.seats],['價格',c=>priceTxt(c),c=>-c.mid],['動力',c=>c.p+'・'+c.eng],['馬力',c=>e(c,'hp')+c.hp+' PS',c=>c.hp],['產地',c=>c.origin],
   ['sec','家用空間'],
-  ['車長',c=>e(c,'len')+fmt(c.len)+' mm',c=>c.len],['軸距',c=>e(c,'wb')+fmt(c.wb)+' mm',c=>c.wb],['後車廂',c=>e(c,'trunk')+c.trunk+' L',c=>c.trunk],
+  ['車長',c=>e(c,'len')+fmt(c.len)+' mm',c=>c.len],['軸距',c=>e(c,'wb')+fmt(c.wb)+' mm',c=>c.wb],['後車廂',c=>e(c,'trunk')+c.trunk+' L'+(c.seats===7?'（三排倒）':''),c=>c.trunk],
   ['sec','省油養車（年）'],
   ['油耗',c=>c.p==='純電'?'續航 '+e(c,'range')+c.range+' km':e(c,'fuel')+c.fuel+' km/L',c=>c.fuelEq],['油/電費',c=>fmt(c.energy)+' 元',c=>-c.energy],['牌照稅',c=>fmt(c.tx.lic)+' 元',c=>-c.tx.lic],['燃料費',c=>fmt(c.tx.fuel)+' 元',c=>-c.tx.fuel],['保養估計',c=>fmt(c.mt*10000)+' 元',c=>-c.mt],['年養車合計',c=>'<b>'+fmt(c.yearCost)+' 元</b>',c=>-c.yearCost],
   ['sec','安全'],
@@ -395,10 +439,11 @@ function info(id){const c=CARS.find(x=>x.id===id),s=sub(c);
  $('sheetBox').innerHTML=`<div class="row" style="justify-content:space-between"><span><span class="tag ${c.c}">${c.c==='new'?'新車':'二手 '+c.yr}</span><span class="tag pw">${c.p}</span></span><button class="btn" id="close">✕</button></div>
  ${coverHtml(c,"cover sm")}<h2>${name(c)}</h2><div class="price">${priceTxt(c)} <small>${c.c==='used'?'參考行情':'牌價'}・推薦分 ${score(c)}</small></div>
  <div class="kv"><span>${c.c==='used'?'各年行情':'各等級'}</span><div>${c.trims}</div>
+ <span>座位</span><div>${c.seats} 人座・${c.body}</div>
  <span>動力</span><div>${c.eng}・${e(c,'hp')}${c.hp} PS</div>
  <span>油耗</span><div>${c.p==='純電'?'續航 '+e(c,'range')+c.range+' km':e(c,'fuel')+c.fuel+' km/L'}</div>
  <span>尺寸</span><div>長 ${e(c,'len')}${fmt(c.len)}・軸距 ${e(c,'wb')}${fmt(c.wb)} mm</div>
- <span>後車廂</span><div>${e(c,'trunk')}${c.trunk} L</div>
+ <span>後車廂</span><div>${e(c,'trunk')}${c.trunk} L${c.seats===7?'（第三排收倒）':''}</div>
  <span>年養車</span><div>約 ${fmt(c.yearCost)} 元（油電 ${fmt(c.energy)}＋稅 ${fmt(c.tx.lic+c.tx.fuel)}＋保養 ${fmt(c.mt*10000)}）</div>
  <span>安全</span><div>${[c.acc&&'ACC',c.aeb&&'AEB',c.lta&&'車道維持',c.bsm!=='—'&&'盲點('+c.bsm+')'].filter(Boolean).join('、')}</div>
  <span>產地</span><div>${c.origin}</div></div>
